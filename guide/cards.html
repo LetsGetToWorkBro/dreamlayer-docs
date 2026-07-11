@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What just appeared on my glasses? - DreamLayer</title>
+<meta name="description" content="Everything DreamLayer shows you is a card: a small round panel that slides in from the edge of your day-ring, stays a few seconds, and files itself away. Cards never stack, never nag, and never cover your view — one at a time, most important first.">
+<meta property="og:title" content="What just appeared on my glasses? - DreamLayer">
+<meta property="og:description" content="Everything DreamLayer shows you is a card: a small round panel that slides in from the edge of your day-ring, stays a few seconds, and files itself away. Cards never stack, never nag, and never cover your view — one at a time, most important first.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%232cc79a' stroke-width='2.6' stroke-dasharray='56 20' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='4' r='3' fill='%232cc79a'/%3E%3C/svg%3E">
+<style>
+:root {
+  --bg: #04080a;
+  --surface: #0b1214;
+  --surface-2: #0e1618;
+  --border: #1c2a2e;
+  --border-soft: #141f22;
+  --ink: #ecf0f1;
+  --ink-2: #a8b8c0;
+  --ink-3: #6d7f87;
+  --teal: #2cc79a;
+  --teal-bright: #43e6b8;
+  --teal-dim: #1a7a60;
+  --attention: #e06b52;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+  --sidebar-w: 288px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink-2);
+  font: 16px/1.7 var(--sans);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(900px 420px at 18% -8%, rgba(44,199,154,.10), transparent 60%),
+    radial-gradient(720px 380px at 92% 0%, rgba(224,107,82,.05), transparent 60%);
+}
+
+/* ------------------------------------------------------------- sidebar */
+#nav-toggle { display: none; }
+.sidebar {
+  position: fixed; z-index: 40; top: 0; left: 0; bottom: 0;
+  width: var(--sidebar-w); overflow-y: auto; overscroll-behavior: contain;
+  background: rgba(8,13,15,.92); backdrop-filter: blur(10px);
+  border-right: 1px solid var(--border-soft);
+  padding: 22px 18px 40px;
+}
+.sidebar::-webkit-scrollbar { width: 8px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.brand {
+  display: flex; align-items: center; gap: 11px;
+  padding: 4px 8px 16px; margin-bottom: 10px;
+  border-bottom: 1px solid var(--border-soft);
+  text-decoration: none;
+}
+.brand svg { flex: none; }
+.brand .name {
+  color: var(--ink); font-weight: 700; font-size: 17px; letter-spacing: .2px;
+}
+.brand .tag {
+  display: block; color: var(--ink-3); font-size: 11px; font-weight: 400;
+  letter-spacing: .3px; margin-top: 1px;
+}
+.nav-section {
+  margin: 20px 8px 6px; font-size: 10.5px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--teal);
+  opacity: .85;
+}
+.sidebar a.page {
+  display: block; padding: 6px 10px; margin: 1px 0;
+  color: var(--ink-2); text-decoration: none; font-size: 13.5px;
+  border-radius: 8px; border-left: 2px solid transparent;
+}
+.sidebar a.page:hover { color: var(--ink); background: rgba(44,199,154,.06); }
+.sidebar a.page.active {
+  color: var(--teal-bright); background: rgba(44,199,154,.09);
+  border-left-color: var(--teal);
+}
+.sidebar .repo {
+  margin: 26px 8px 0; font-size: 12.5px;
+}
+.sidebar .repo a { color: var(--ink-3); text-decoration: none; }
+.sidebar .repo a:hover { color: var(--teal); }
+
+/* ------------------------------------------------------------- topbar */
+.topbar {
+  display: none; position: sticky; top: 0; z-index: 30;
+  align-items: center; gap: 12px;
+  background: rgba(4,8,10,.9); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-soft); padding: 12px 16px;
+}
+.topbar label {
+  display: inline-flex; flex-direction: column; gap: 4px; cursor: pointer;
+  padding: 6px;
+}
+.topbar label span {
+  display: block; width: 20px; height: 2px; background: var(--ink-2);
+  border-radius: 2px;
+}
+.topbar .t-name { color: var(--ink); font-weight: 700; font-size: 15px; }
+
+/* ------------------------------------------------------------- content */
+.main { position: relative; z-index: 1; margin-left: var(--sidebar-w); }
+.page-wrap { max-width: 828px; margin: 0 auto; padding: 52px 40px 40px; }
+.crumb {
+  font-size: 11px; font-weight: 700; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--teal); margin: 0 0 10px;
+}
+article h1 {
+  color: var(--ink); font-size: 37px; line-height: 1.15; letter-spacing: -.5px;
+  margin: 0 0 18px; font-weight: 750;
+}
+article h2 {
+  color: var(--ink); font-size: 23px; letter-spacing: -.2px;
+  margin: 44px 0 12px; padding-top: 18px;
+  border-top: 1px solid var(--border-soft); font-weight: 700;
+}
+article h3 { color: var(--ink); font-size: 17.5px; margin: 30px 0 8px; font-weight: 650; }
+article h4 { color: var(--ink); font-size: 15px; margin: 24px 0 6px; }
+article p { margin: 0 0 14px; }
+article a { color: var(--teal); text-decoration: none; border-bottom: 1px solid rgba(44,199,154,.3); }
+article a:hover { color: var(--teal-bright); border-bottom-color: var(--teal-bright); }
+article strong { color: var(--ink); font-weight: 650; }
+article ul, article ol { padding-left: 26px; margin: 0 0 14px; }
+article li { margin: 5px 0; }
+article li::marker { color: var(--teal-dim); }
+article hr { border: none; border-top: 1px solid var(--border-soft); margin: 32px 0; }
+article blockquote {
+  margin: 20px 0; padding: 14px 20px;
+  border-left: 3px solid var(--teal);
+  background: linear-gradient(90deg, rgba(44,199,154,.07), transparent 70%);
+  border-radius: 0 10px 10px 0; color: var(--ink);
+}
+article blockquote p { margin: 6px 0; }
+article code {
+  font-family: var(--mono); font-size: .85em;
+  background: var(--surface-2); border: 1px solid var(--border-soft);
+  border-radius: 6px; padding: 1.5px 6px; color: #9fe8cf;
+}
+article pre {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px 18px; overflow-x: auto;
+  margin: 18px 0; line-height: 1.55;
+}
+article pre code { background: none; border: none; padding: 0; color: #c9dbd4; font-size: 13px; }
+
+article img {
+  max-width: 100%; height: auto; border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #000; display: block; margin: 6px auto;
+  box-shadow: 0 8px 40px rgba(0,0,0,.5), 0 0 0 1px rgba(44,199,154,.04);
+}
+article p > img:only-child { margin: 20px auto; }
+article p:has(> img:only-child) + p > em:only-child,
+article img + em { color: var(--ink-3); font-size: 13px; }
+
+article table {
+  width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px;
+  display: block; overflow-x: auto;
+}
+article th {
+  text-align: left; color: var(--teal); font-size: 11.5px;
+  text-transform: uppercase; letter-spacing: .08em;
+  border-bottom: 1px solid var(--border); padding: 8px 14px 8px 0;
+  white-space: nowrap;
+}
+article td {
+  border-bottom: 1px solid var(--border-soft);
+  padding: 9px 14px 9px 0; vertical-align: top;
+}
+article td img { margin: 4px 0; min-width: 130px; }
+article tr:last-child td { border-bottom: none; }
+
+/* ------------------------------------------------------------- footer nav */
+.pagenav {
+  display: flex; gap: 14px; margin-top: 56px;
+  border-top: 1px solid var(--border-soft); padding-top: 22px;
+}
+.pagenav a {
+  flex: 1; display: block; padding: 14px 18px; text-decoration: none;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; transition: border-color .15s ease;
+}
+.pagenav a:hover { border-color: var(--teal-dim); }
+.pagenav .dir { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.pagenav .ttl { color: var(--ink); font-weight: 600; font-size: 14.5px; margin-top: 3px; }
+.pagenav a.next { text-align: right; }
+.foot {
+  margin: 44px 0 0; color: var(--ink-3); font-size: 12.5px;
+  border-top: 1px solid transparent; padding-top: 8px;
+}
+.foot a { color: var(--ink-3); }
+.foot a:hover { color: var(--teal); }
+
+/* ------------------------------------------------------------- mobile */
+@media (max-width: 980px) {
+  .topbar { display: flex; }
+  .sidebar { transform: translateX(-100%); transition: transform .22s ease; }
+  #nav-toggle:checked ~ .sidebar { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .page-wrap { padding: 30px 20px 28px; }
+  article h1 { font-size: 29px; }
+  .pagenav { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+<input type="checkbox" id="nav-toggle">
+<nav class="sidebar">
+  <a class="brand" href="../index.html"><svg width='30' height='30' viewBox='0 0 32 32' aria-hidden='true'><circle cx='16' cy='16' r='12' fill='none' stroke='#2cc79a' stroke-width='2.4' stroke-dasharray='56 20' stroke-linecap='round'/><circle cx='16' cy='4' r='3' fill='#43e6b8'/></svg>
+    <span><span class="name">DreamLayer</span>
+    <span class="tag">A memory layer for the real world</span></span></a>
+  <a class="page" href="../index.html">DreamLayer</a>
+  <div class="nav-section">Using DreamLayer</div>
+  <a class="page" href="../guide/start-here.html">Start here</a>
+  <a class="page" href="../guide/setup.html">Setting up</a>
+  <a class="page" href="../guide/a-day-with-dreamlayer.html">A day with DreamLayer</a>
+  <a class="page" href="../guide/talking-to-juno.html">Talking to it</a>
+  <a class="page active" href="../guide/cards.html">What just appeared on my glasses?</a>
+  <a class="page" href="../guide/truth.html">The fact-checker</a>
+  <a class="page" href="../guide/privacy.html">Your privacy</a>
+  <a class="page" href="../guide/apps.html">The phone and the Mac</a>
+  <a class="page" href="../guide/faq.html">Questions people ask</a>
+  <div class="nav-section">Under the hood</div>
+  <a class="page" href="../architecture.html">Ecosystem architecture</a>
+  <a class="page" href="../glasses-experience.html">The glasses experience</a>
+  <a class="page" href="../simulator.html">The Halo Simulator</a>
+  <a class="page" href="../hud-cards.html">HUD cards — the full gallery</a>
+  <a class="page" href="../meridian.html">Meridian — the design language</a>
+  <a class="page" href="../juno.html">Juno</a>
+  <a class="page" href="../perception-memory.html">Perception and memory</a>
+  <a class="page" href="../truth.html">Truth and discernment</a>
+  <a class="page" href="../attention-focus.html">Attention and focus</a>
+  <a class="page" href="../world-lenses.html">Scholar and TasteLens — the World lenses</a>
+  <a class="page" href="../lenses.html">The six lenses and the wider set</a>
+  <a class="page" href="../progression.html">Progression — the Saga</a>
+  <a class="page" href="../privacy.html">Privacy and control</a>
+  <a class="page" href="../phone-app.html">The phone app</a>
+  <a class="page" href="../brain-app.html">The desktop Brain app</a>
+  <a class="page" href="../ai-brain.html">The AI Brain deep dive</a>
+  <a class="page" href="../integrations.html">Integrations and capabilities</a>
+  <a class="page" href="../platform.html">The platform — plugins, the mesh, and the store</a>
+  <a class="page" href="../lens-builder.html">The Lens Builder — lenses without code</a>
+  <a class="page" href="../community.html">The community layer — gallery, Golf, Jams</a>
+  <a class="page" href="../sdk.html">The SDK — plugins with code</a>
+  <a class="page" href="../cloud.html">DreamLayer Cloud</a>
+  <div class="nav-section">Reference</div>
+  <a class="page" href="../reference/settings.html">Settings and modes</a>
+  <a class="page" href="../reference/endpoints.html">Brain HTTP API</a>
+  <a class="page" href="../reference/cards.html">Card catalog</a>
+  <a class="page" href="../reference/earcons.html">Earcons and haptics</a>
+  <div class="nav-section">Appendix</div>
+  <a class="page" href="../hardware-seams.html">Hardware and seams</a>
+  <a class="page" href="../builders.html">For builders</a>
+  <a class="page" href="../open-source.html">Open source</a>
+  <a class="page" href="../glossary.html">Glossary</a>
+  <div class="repo"><a href="https://github.com/LetsGetToWorkBro/dreamlayer-docs">Source on GitHub</a></div>
+</nav>
+<div class="main">
+  <div class="topbar">
+    <label for="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></label>
+    <span class="t-name">DreamLayer</span>
+  </div>
+  <div class="page-wrap">
+    <p class="crumb">Using DreamLayer</p>
+    <article>
+<h1 id="what-just-appeared-on-my-glasses">What just appeared on my glasses?</h1>
+<p>Everything DreamLayer shows you is a <strong>card</strong>: a small round panel that
+slides in from the edge of your day-ring, stays a few seconds, and files
+itself away. Cards never stack, never nag, and never cover your view — one
+at a time, most important first.</p>
+<p>This is the glance guide: what each card means and why it showed up. (The
+engineering-level detail on every card lives in
+<a href="../hud-cards.html">the technical gallery</a>.)</p>
+<h2 id="the-everyday-ones">The everyday ones</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="Ready" src="../assets/cards/ready.webp" /></td>
+<td><strong>The quiet mark.</strong> The glasses are on and <em>not</em> listening. This is what "idle" looks like.</td>
+</tr>
+<tr>
+<td><img alt="Listening" src="../assets/cards/query_listening.webp" /></td>
+<td><strong>It's listening.</strong> You woke Juno; the bars move with your voice.</td>
+</tr>
+<tr>
+<td><img alt="Thinking" src="../assets/cards/loading.webp" /></td>
+<td><strong>Thinking.</strong> Your question is being answered.</td>
+</tr>
+<tr>
+<td><img alt="Saved" src="../assets/cards/saved_memory.webp" /></td>
+<td><strong>Kept.</strong> The moment you just saved is safely remembered.</td>
+</tr>
+<tr>
+<td><img alt="Reply" src="../assets/cards/juno_reply.webp" /></td>
+<td><strong>Juno answering</strong> you, or confirming something it just did.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="memory-coming-back-to-you">Memory coming back to you</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="Object recall" src="../assets/cards/object_recall.webp" /></td>
+<td><strong>Where your thing is.</strong> The little map shows you (the dot at the bottom), the place, and the object — with how sure it is and when it last saw it.</td>
+</tr>
+<tr>
+<td><img alt="Commitment" src="../assets/cards/commitment_recall.webp" /></td>
+<td><strong>A promise.</strong> Who, what, and when — either one you asked about, or one it just heard you make.</td>
+</tr>
+<tr>
+<td><img alt="Drift" src="../assets/cards/commitment_drift.webp" /></td>
+<td><strong>A promise slipping.</strong> The bar on the left is draining; the promise is getting old. It surfaces before you break it, not after.</td>
+</tr>
+<tr>
+<td><img alt="Proactive" src="../assets/cards/proactive_memory.webp" /></td>
+<td><strong>This place holds a memory.</strong> You arrived somewhere, and something you left or noted here came back with you.</td>
+</tr>
+<tr>
+<td><img alt="Brief" src="../assets/cards/morning_brief.webp" /></td>
+<td><strong>Your morning brief.</strong> The day ahead, in two sentences.</td>
+</tr>
+<tr>
+<td><img alt="Rewind" src="../assets/cards/time_scrub_node.webp" /></td>
+<td><strong>Rewinding.</strong> One moment of your day; scrub back and forth through them.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="people">People</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="Person" src="../assets/cards/person_context.webp" /></td>
+<td><strong>Someone you know is here.</strong> Name, one line of why they matter right now ("owes you the lease").</td>
+</tr>
+<tr>
+<td><img alt="Dossier" src="../assets/cards/person_dossier.webp" /></td>
+<td><strong>Your history with them.</strong> When you last met and what you two tend to talk about. Only for people you chose to save — never strangers.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="looking-at-the-world">Looking at the world</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="Scholar answer" src="../assets/cards/scholar_answer.webp" /></td>
+<td><strong>The answer, read off the page.</strong> You looked at a question and asked for the answer.</td>
+</tr>
+<tr>
+<td><img alt="Form help" src="../assets/cards/scholar_form.webp" /></td>
+<td><strong>Form help.</strong> Every field on the form in front of you, and what goes in it.</td>
+</tr>
+<tr>
+<td><img alt="Plain words" src="../assets/cards/scholar_explain.webp" /></td>
+<td><strong>In plain words.</strong> Dense text — a contract clause, a spec — translated into language people actually use.</td>
+</tr>
+<tr>
+<td><img alt="Best pick" src="../assets/cards/taste.webp" /></td>
+<td><strong>The pick.</strong> You looked at a shelf or a menu; the winner is big, the runners-up show their reasons, and anything that breaks your dietary rules is flagged with a cross — never silently hidden.</td>
+</tr>
+<tr>
+<td><img alt="Which one?" src="../assets/cards/glance_choice.webp" /></td>
+<td><strong>"What do you want?"</strong> Your look was ambiguous — one tap picks, and it learns your preference for next time.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="conversation-helpers">Conversation helpers</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="Caption" src="../assets/cards/spoken_caption.webp" /></td>
+<td><strong>Live captions.</strong> What was just said, written at the edge.</td>
+</tr>
+<tr>
+<td><img alt="Translation" src="../assets/cards/live_caption.webp" /></td>
+<td><strong>Translation.</strong> Speech or text in another language, rendered in yours.</td>
+</tr>
+<tr>
+<td><img alt="Answer ahead" src="../assets/cards/answer_ahead.webp" /></td>
+<td><strong>"On the tip of your tongue."</strong> Someone asked a question; here is the answer, silently, for you to say.</td>
+</tr>
+<tr>
+<td><img alt="Fact check" src="../assets/cards/fact_check.webp" /></td>
+<td><strong>The fact-checker spoke.</strong> Green means verified, amber means check this, red means they contradicted themselves. Full story in <a href="truth.html">The fact-checker</a>.</td>
+</tr>
+<tr>
+<td><img alt="Truth gauge" src="../assets/cards/truth_gauge.webp" /></td>
+<td><strong>A read on delivery.</strong> The ring shows how the analysis went around its nine steps — smooth arcs read as steady, torn gaps as strained. It only judges people it knows well.</td>
+</tr>
+<tr>
+<td><img alt="Hark" src="../assets/cards/hark.webp" /></td>
+<td><strong>"Listen!" — a tap on the shoulder.</strong> The one thing worth telling you right now: you are about to be late, you owe the person in front of you, you are walking away from your stuff. Amber means urgent.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="privacy--deliberately-loud">Privacy — deliberately loud</h2>
+<p>These cards break the calm on purpose: no soft entrance, no gentle glow.
+They slam in, because you should never be unsure about privacy.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="Veil" src="../assets/cards/privacy_veil.webp" /></td>
+<td><strong>Fully off.</strong> Deaf and blind until you hold the button again.</td>
+</tr>
+<tr>
+<td><img alt="Forget" src="../assets/cards/forget_last.webp" /></td>
+<td><strong>Forgotten.</strong> The last capture is gone, as you asked.</td>
+</tr>
+<tr>
+<td><img alt="Private zone" src="../assets/cards/private_zone.webp" /></td>
+<td><strong>A no-record place.</strong> You marked this place private; nothing records here.</td>
+</tr>
+<tr>
+<td><img alt="Consent" src="../assets/cards/consent_required.webp" /></td>
+<td><strong>Your call.</strong> Something new wants access; nothing proceeds until you say so.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-odd-ones-out">The odd ones out</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="Deviation" src="../assets/cards/deviation_alert.webp" /></td>
+<td><strong>"That's not what you said before."</strong> Your own plan changed — a gentle before-versus-now nudge.</td>
+</tr>
+<tr>
+<td><img alt="Error" src="../assets/cards/error.webp" /></td>
+<td><strong>Something failed.</strong> One plain sentence about what.</td>
+</tr>
+<tr>
+<td><img alt="Not sure" src="../assets/cards/low_confidence.webp" /></td>
+<td><strong>An honest shrug.</strong> It does not know, and it says so rather than guessing.</td>
+</tr>
+<tr>
+<td><img alt="Anchor" src="../assets/cards/world_anchor.webp" /></td>
+<td><strong>A memory echo.</strong> In Dream Mode, a pale note pinned to the place you are standing.</td>
+</tr>
+<tr>
+<td><img alt="Synesthesia" src="../assets/cards/synesthesia.webp" /></td>
+<td><strong>Dream Mode poetry.</strong> Six words for what this moment feels like. Double-tap enters and leaves this mode.</td>
+</tr>
+</tbody>
+</table>
+    </article>
+    <div class="pagenav"><a class="prev" href="../guide/talking-to-juno.html"><span class="dir">Previous</span><span class="ttl">Talking to it</span></a><a class="next" href="../guide/truth.html"><span class="dir">Next</span><span class="ttl">The fact-checker</span></a></div>
+    <p class="foot">DreamLayer knowledge base. Every image is rendered by the
+    product's own pipeline. <a href="https://github.com/LetsGetToWorkBro/dreamlayer-docs">Site repository</a></p>
+  </div>
+</div>
+</body>
+</html>

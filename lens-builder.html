@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Lens Builder — lenses without code - DreamLayer</title>
+<meta name="description" content="A lens (a figment — a small on-glass behavior) is data, not code: it cannot name a function, run forever, or misbehave, and the glasses re-prove it safe before running it. The Lens Builder turns that property into a product: anyone can compose a lens in the browser, watch it run ">
+<meta property="og:title" content="The Lens Builder — lenses without code - DreamLayer">
+<meta property="og:description" content="A lens (a figment — a small on-glass behavior) is data, not code: it cannot name a function, run forever, or misbehave, and the glasses re-prove it safe before running it. The Lens Builder turns that property into a product: anyone can compose a lens in the browser, watch it run ">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%232cc79a' stroke-width='2.6' stroke-dasharray='56 20' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='4' r='3' fill='%232cc79a'/%3E%3C/svg%3E">
+<style>
+:root {
+  --bg: #04080a;
+  --surface: #0b1214;
+  --surface-2: #0e1618;
+  --border: #1c2a2e;
+  --border-soft: #141f22;
+  --ink: #ecf0f1;
+  --ink-2: #a8b8c0;
+  --ink-3: #6d7f87;
+  --teal: #2cc79a;
+  --teal-bright: #43e6b8;
+  --teal-dim: #1a7a60;
+  --attention: #e06b52;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+  --sidebar-w: 288px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink-2);
+  font: 16px/1.7 var(--sans);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(900px 420px at 18% -8%, rgba(44,199,154,.10), transparent 60%),
+    radial-gradient(720px 380px at 92% 0%, rgba(224,107,82,.05), transparent 60%);
+}
+
+/* ------------------------------------------------------------- sidebar */
+#nav-toggle { display: none; }
+.sidebar {
+  position: fixed; z-index: 40; top: 0; left: 0; bottom: 0;
+  width: var(--sidebar-w); overflow-y: auto; overscroll-behavior: contain;
+  background: rgba(8,13,15,.92); backdrop-filter: blur(10px);
+  border-right: 1px solid var(--border-soft);
+  padding: 22px 18px 40px;
+}
+.sidebar::-webkit-scrollbar { width: 8px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.brand {
+  display: flex; align-items: center; gap: 11px;
+  padding: 4px 8px 16px; margin-bottom: 10px;
+  border-bottom: 1px solid var(--border-soft);
+  text-decoration: none;
+}
+.brand svg { flex: none; }
+.brand .name {
+  color: var(--ink); font-weight: 700; font-size: 17px; letter-spacing: .2px;
+}
+.brand .tag {
+  display: block; color: var(--ink-3); font-size: 11px; font-weight: 400;
+  letter-spacing: .3px; margin-top: 1px;
+}
+.nav-section {
+  margin: 20px 8px 6px; font-size: 10.5px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--teal);
+  opacity: .85;
+}
+.sidebar a.page {
+  display: block; padding: 6px 10px; margin: 1px 0;
+  color: var(--ink-2); text-decoration: none; font-size: 13.5px;
+  border-radius: 8px; border-left: 2px solid transparent;
+}
+.sidebar a.page:hover { color: var(--ink); background: rgba(44,199,154,.06); }
+.sidebar a.page.active {
+  color: var(--teal-bright); background: rgba(44,199,154,.09);
+  border-left-color: var(--teal);
+}
+.sidebar .repo {
+  margin: 26px 8px 0; font-size: 12.5px;
+}
+.sidebar .repo a { color: var(--ink-3); text-decoration: none; }
+.sidebar .repo a:hover { color: var(--teal); }
+
+/* ------------------------------------------------------------- topbar */
+.topbar {
+  display: none; position: sticky; top: 0; z-index: 30;
+  align-items: center; gap: 12px;
+  background: rgba(4,8,10,.9); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-soft); padding: 12px 16px;
+}
+.topbar label {
+  display: inline-flex; flex-direction: column; gap: 4px; cursor: pointer;
+  padding: 6px;
+}
+.topbar label span {
+  display: block; width: 20px; height: 2px; background: var(--ink-2);
+  border-radius: 2px;
+}
+.topbar .t-name { color: var(--ink); font-weight: 700; font-size: 15px; }
+
+/* ------------------------------------------------------------- content */
+.main { position: relative; z-index: 1; margin-left: var(--sidebar-w); }
+.page-wrap { max-width: 828px; margin: 0 auto; padding: 52px 40px 40px; }
+.crumb {
+  font-size: 11px; font-weight: 700; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--teal); margin: 0 0 10px;
+}
+article h1 {
+  color: var(--ink); font-size: 37px; line-height: 1.15; letter-spacing: -.5px;
+  margin: 0 0 18px; font-weight: 750;
+}
+article h2 {
+  color: var(--ink); font-size: 23px; letter-spacing: -.2px;
+  margin: 44px 0 12px; padding-top: 18px;
+  border-top: 1px solid var(--border-soft); font-weight: 700;
+}
+article h3 { color: var(--ink); font-size: 17.5px; margin: 30px 0 8px; font-weight: 650; }
+article h4 { color: var(--ink); font-size: 15px; margin: 24px 0 6px; }
+article p { margin: 0 0 14px; }
+article a { color: var(--teal); text-decoration: none; border-bottom: 1px solid rgba(44,199,154,.3); }
+article a:hover { color: var(--teal-bright); border-bottom-color: var(--teal-bright); }
+article strong { color: var(--ink); font-weight: 650; }
+article ul, article ol { padding-left: 26px; margin: 0 0 14px; }
+article li { margin: 5px 0; }
+article li::marker { color: var(--teal-dim); }
+article hr { border: none; border-top: 1px solid var(--border-soft); margin: 32px 0; }
+article blockquote {
+  margin: 20px 0; padding: 14px 20px;
+  border-left: 3px solid var(--teal);
+  background: linear-gradient(90deg, rgba(44,199,154,.07), transparent 70%);
+  border-radius: 0 10px 10px 0; color: var(--ink);
+}
+article blockquote p { margin: 6px 0; }
+article code {
+  font-family: var(--mono); font-size: .85em;
+  background: var(--surface-2); border: 1px solid var(--border-soft);
+  border-radius: 6px; padding: 1.5px 6px; color: #9fe8cf;
+}
+article pre {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px 18px; overflow-x: auto;
+  margin: 18px 0; line-height: 1.55;
+}
+article pre code { background: none; border: none; padding: 0; color: #c9dbd4; font-size: 13px; }
+
+article img {
+  max-width: 100%; height: auto; border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #000; display: block; margin: 6px auto;
+  box-shadow: 0 8px 40px rgba(0,0,0,.5), 0 0 0 1px rgba(44,199,154,.04);
+}
+article p > img:only-child { margin: 20px auto; }
+article p:has(> img:only-child) + p > em:only-child,
+article img + em { color: var(--ink-3); font-size: 13px; }
+
+article table {
+  width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px;
+  display: block; overflow-x: auto;
+}
+article th {
+  text-align: left; color: var(--teal); font-size: 11.5px;
+  text-transform: uppercase; letter-spacing: .08em;
+  border-bottom: 1px solid var(--border); padding: 8px 14px 8px 0;
+  white-space: nowrap;
+}
+article td {
+  border-bottom: 1px solid var(--border-soft);
+  padding: 9px 14px 9px 0; vertical-align: top;
+}
+article td img { margin: 4px 0; min-width: 130px; }
+article tr:last-child td { border-bottom: none; }
+
+/* ------------------------------------------------------------- footer nav */
+.pagenav {
+  display: flex; gap: 14px; margin-top: 56px;
+  border-top: 1px solid var(--border-soft); padding-top: 22px;
+}
+.pagenav a {
+  flex: 1; display: block; padding: 14px 18px; text-decoration: none;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; transition: border-color .15s ease;
+}
+.pagenav a:hover { border-color: var(--teal-dim); }
+.pagenav .dir { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.pagenav .ttl { color: var(--ink); font-weight: 600; font-size: 14.5px; margin-top: 3px; }
+.pagenav a.next { text-align: right; }
+.foot {
+  margin: 44px 0 0; color: var(--ink-3); font-size: 12.5px;
+  border-top: 1px solid transparent; padding-top: 8px;
+}
+.foot a { color: var(--ink-3); }
+.foot a:hover { color: var(--teal); }
+
+/* ------------------------------------------------------------- mobile */
+@media (max-width: 980px) {
+  .topbar { display: flex; }
+  .sidebar { transform: translateX(-100%); transition: transform .22s ease; }
+  #nav-toggle:checked ~ .sidebar { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .page-wrap { padding: 30px 20px 28px; }
+  article h1 { font-size: 29px; }
+  .pagenav { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+<input type="checkbox" id="nav-toggle">
+<nav class="sidebar">
+  <a class="brand" href="index.html"><svg width='30' height='30' viewBox='0 0 32 32' aria-hidden='true'><circle cx='16' cy='16' r='12' fill='none' stroke='#2cc79a' stroke-width='2.4' stroke-dasharray='56 20' stroke-linecap='round'/><circle cx='16' cy='4' r='3' fill='#43e6b8'/></svg>
+    <span><span class="name">DreamLayer</span>
+    <span class="tag">A memory layer for the real world</span></span></a>
+  <a class="page" href="index.html">DreamLayer</a>
+  <div class="nav-section">Using DreamLayer</div>
+  <a class="page" href="guide/start-here.html">Start here</a>
+  <a class="page" href="guide/setup.html">Setting up</a>
+  <a class="page" href="guide/a-day-with-dreamlayer.html">A day with DreamLayer</a>
+  <a class="page" href="guide/talking-to-juno.html">Talking to it</a>
+  <a class="page" href="guide/cards.html">What just appeared on my glasses?</a>
+  <a class="page" href="guide/truth.html">The fact-checker</a>
+  <a class="page" href="guide/privacy.html">Your privacy</a>
+  <a class="page" href="guide/apps.html">The phone and the Mac</a>
+  <a class="page" href="guide/faq.html">Questions people ask</a>
+  <div class="nav-section">Under the hood</div>
+  <a class="page" href="architecture.html">Ecosystem architecture</a>
+  <a class="page" href="glasses-experience.html">The glasses experience</a>
+  <a class="page" href="simulator.html">The Halo Simulator</a>
+  <a class="page" href="hud-cards.html">HUD cards — the full gallery</a>
+  <a class="page" href="meridian.html">Meridian — the design language</a>
+  <a class="page" href="juno.html">Juno</a>
+  <a class="page" href="perception-memory.html">Perception and memory</a>
+  <a class="page" href="truth.html">Truth and discernment</a>
+  <a class="page" href="attention-focus.html">Attention and focus</a>
+  <a class="page" href="world-lenses.html">Scholar and TasteLens — the World lenses</a>
+  <a class="page" href="lenses.html">The six lenses and the wider set</a>
+  <a class="page" href="progression.html">Progression — the Saga</a>
+  <a class="page" href="privacy.html">Privacy and control</a>
+  <a class="page" href="phone-app.html">The phone app</a>
+  <a class="page" href="brain-app.html">The desktop Brain app</a>
+  <a class="page" href="ai-brain.html">The AI Brain deep dive</a>
+  <a class="page" href="integrations.html">Integrations and capabilities</a>
+  <a class="page" href="platform.html">The platform — plugins, the mesh, and the store</a>
+  <a class="page active" href="lens-builder.html">The Lens Builder — lenses without code</a>
+  <a class="page" href="community.html">The community layer — gallery, Golf, Jams</a>
+  <a class="page" href="sdk.html">The SDK — plugins with code</a>
+  <a class="page" href="cloud.html">DreamLayer Cloud</a>
+  <div class="nav-section">Reference</div>
+  <a class="page" href="reference/settings.html">Settings and modes</a>
+  <a class="page" href="reference/endpoints.html">Brain HTTP API</a>
+  <a class="page" href="reference/cards.html">Card catalog</a>
+  <a class="page" href="reference/earcons.html">Earcons and haptics</a>
+  <div class="nav-section">Appendix</div>
+  <a class="page" href="hardware-seams.html">Hardware and seams</a>
+  <a class="page" href="builders.html">For builders</a>
+  <a class="page" href="open-source.html">Open source</a>
+  <a class="page" href="glossary.html">Glossary</a>
+  <div class="repo"><a href="https://github.com/LetsGetToWorkBro/dreamlayer-docs">Source on GitHub</a></div>
+</nav>
+<div class="main">
+  <div class="topbar">
+    <label for="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></label>
+    <span class="t-name">DreamLayer</span>
+  </div>
+  <div class="page-wrap">
+    <p class="crumb">Under the hood</p>
+    <article>
+<h1 id="the-lens-builder--lenses-without-code">The Lens Builder — lenses without code</h1>
+<p>A lens (a figment — a small on-glass behavior) is <strong>data, not code</strong>: it
+cannot name a function, run forever, or misbehave, and the glasses re-prove
+it safe before running it. The Lens Builder turns that property into a
+product: anyone can compose a lens in the browser, watch it run on a live
+ring preview, and put it on their own glasses — no toolchain, no account.</p>
+<p>It lives in two places, same page either way:</p>
+<ul>
+<li><strong>The web</strong> — <a href="https://dreamlayer.app/lens-builder.html">dreamlayer.app/lens-builder.html</a>,
+  a fully static page; nothing typed into it leaves the browser.</li>
+<li><strong>Your Brain</strong> — <code>GET /dreamlayer/build</code> serves the identical page
+  same-origin (the panel's Plugins view links it: "Build a lens →"), which
+  is what makes one-click <strong>Deploy to my Brain</strong> possible.</li>
+</ul>
+<p><img alt="The Lens Builder — scene-graph editor, live ring preview, Ask Juno" src="assets/site/lens_builder.png" /></p>
+<h2 id="what-building-feels-like">What building feels like</h2>
+<ul>
+<li><strong>Recipes and presets</strong> — start from a wonder, not a countdown: interval
+  timer, checklist ritual, box-breathing, a breathing mandala, and the
+  brain-fed showcases (Whisper, Second Sight, Ember, Coach and friends).
+  Presets marked as brain-powered come alive on a paired Brain; the builder
+  simulates the feed so you can watch either way.</li>
+<li><strong>The scene-graph editor</strong> — scenes, transitions, counters, and the
+  event grammar (taps, timeouts, IMU nods/shakes/peeks, <code>place:enter</code>,
+  bond presence) composed directly.</li>
+<li><strong>Paint on lenses</strong> — draw on the ring with bounded vector strokes.
+  Strokes are data (stroke, vertex, and color counts are capped), so a
+  painted lens re-proves safe exactly like any other.</li>
+<li><strong>A live preview</strong> — the page runs your lens through <code>figment.js</code>, a
+  JavaScript twin of the Python stage interpreter, pinned to it
+  line-for-line by <code>test_lens_builder.py</code>.</li>
+</ul>
+<h2 id="ask-juno">Ask Juno</h2>
+<p>Type <em>"a 5 minute countdown that pulses at the end"</em> or <em>"box breathing,
+4 seconds each"</em> and Juno drafts the lens: <code>POST /dreamlayer/rc/compose</code>
+runs the <strong>offline intent parser</strong> — no cloud, no model — and returns a
+budget-verified figment into the editor for you to review; it never
+deploys anything itself. On the static page (no Brain), a client-side
+recipe match answers the same phrasings. When neither can help, it says
+so: "Juno couldn't turn that into a lens yet."</p>
+<h2 id="the-first-visit-tour--whats-possible">The first-visit tour — "What's possible"</h2>
+<p><img alt="The nine-chapter tour: &quot;You can't break it. That's the point.&quot;" src="assets/site/builder_tour.png" /></p>
+<p>A nine-chapter guided showcase opens on first visit (and from the
+"What's possible" button): translate anything, your Brain on glass, name
+what you see, feel them near, memory returned, coach your form, paint that
+breathes. Chapter one states the thesis: <em>"Everything here is a figment — a
+little machine described as data... So don't hold back. The wilder your
+idea, the more this matters — and it still can't hurt anything."</em></p>
+<h2 id="the-safety-card-then-the-deploy">The safety card, then the deploy</h2>
+<p>Before anything ships, the <strong>proof-carrying safety card</strong> renders the
+machine-verified upper bound — the card literally begins "This behavior
+CANNOT:" — no pulsing faster than the strobe cap, no flooding emits, no
+extra lines, no network, files, camera, or microphone, and it can never
+swallow the kill switch (double-long-press banish lives below every
+figment). The same card is available from the command line:
+<code>dreamlayer figment safety &lt;file&gt;</code>.</p>
+<p><strong>Deploy to my Brain</strong> posts the lens to <code>POST /dreamlayer/rc/import</code>. The
+Brain trusts nothing about the author: it re-runs the safety screen,
+re-verifies every budget, mints a fresh id, and <strong>re-signs</strong> the figment
+with its own key before staging it.</p>
+<p>One deliberate security choice makes this safe: every <code>/dreamlayer/build*</code>
+response carries <strong>no CORS headers</strong>. A cross-origin page can never read
+the Brain's pairing token; one-click deploy works precisely because the
+builder is served <em>by</em> the Brain, same-origin, with the token injected
+only for localhost requests — the same rule the panel follows.</p>
+<h2 id="share-a-lens-in-a-link">Share a lens in a link</h2>
+<p>"Share this lens" encodes the whole figment into a URL (and a scannable
+QR): base64url of the lens itself, nothing hosted anywhere. Whoever opens
+it gets a remix banner and a live preview, and if they deploy it, <em>their</em>
+glasses re-prove it safe — sharing carries zero trust. The encoder is
+mirrored byte-for-byte in the registry Worker (<code>test_qr_parity.py</code>), which
+is what makes the <a href="community.html">community layer</a> verifiable.</p>
+<h2 id="the-loop-glass-to-brain-and-back">The loop: glass to Brain and back</h2>
+<p>A running lens is not sealed off from the rest of the stack — two narrow,
+rate-limited wires connect it:</p>
+<ul>
+<li><code>POST /dreamlayer/rc/feed {text, source}</code> — the host streams one line
+  into the lens's <code>{slot}</code> (a translation, a camera label, a resurfaced
+  memory).</li>
+<li><code>POST /dreamlayer/rc/emit {tag, text}</code> — the lens speaks back. The tag
+  <code>ask</code> runs the Brain over a spoken question and pushes the answer into
+  the slot; any other tag carries a payload.</li>
+</ul>
+<p>On the phone, <code>lensRelay.ts</code> closes the full circle — glass → Brain →
+glass — over the BLE bridge (pinned by <code>lens_relay.test.ts</code>). The named
+showcases ride exactly this loop: <strong>Whisper</strong> (live translation in the
+slot), <strong>Second Sight</strong> (the camera's label), <strong>Ember</strong> (a memory,
+returned). Today the Brain-side deploys record their BLE envelopes until
+the glasses transport attaches — the loop's logic is closed and tested;
+the radio is the seam.</p>
+<h2 id="where-the-pieces-live">Where the pieces live</h2>
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>Path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The builder page</td>
+<td><code>landing/lens-builder.html</code></td>
+</tr>
+<tr>
+<td>The JS interpreter twin</td>
+<td><code>landing/assets/lens/figment.js</code> (<code>LensKit</code>)</td>
+</tr>
+<tr>
+<td>Same-origin serving + compose/feed/emit/import</td>
+<td><code>ai_brain/server/server.py</code></td>
+</tr>
+<tr>
+<td>JS-Python parity tests</td>
+<td><code>host-python/.../tests/test_lens_builder.py</code>, <code>test_qr_parity.py</code></td>
+</tr>
+<tr>
+<td>Safety card / impersonation screen / golf referee</td>
+<td><code>reality_compiler/v2/safety.py</code>, <code>impersonation.py</code>, <code>golf.py</code></td>
+</tr>
+</tbody>
+</table>
+    </article>
+    <div class="pagenav"><a class="prev" href="platform.html"><span class="dir">Previous</span><span class="ttl">The platform — plugins, the mesh, and the store</span></a><a class="next" href="community.html"><span class="dir">Next</span><span class="ttl">The community layer — gallery, Golf, Jams</span></a></div>
+    <p class="foot">DreamLayer knowledge base. Every image is rendered by the
+    product's own pipeline. <a href="https://github.com/LetsGetToWorkBro/dreamlayer-docs">Site repository</a></p>
+  </div>
+</div>
+</body>
+</html>

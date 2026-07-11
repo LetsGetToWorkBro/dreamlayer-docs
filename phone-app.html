@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The phone app - DreamLayer</title>
+<meta name="description" content="The phone app (phone-app/, Expo / React Native, TypeScript strict) is the remote control and the pocket brain: pairing, the three switches, every toggle, message approval, and a phone-sized view of everything the Brain knows. Seven tabs — Brain, Now, Look, Messages, People, Memor">
+<meta property="og:title" content="The phone app - DreamLayer">
+<meta property="og:description" content="The phone app (phone-app/, Expo / React Native, TypeScript strict) is the remote control and the pocket brain: pairing, the three switches, every toggle, message approval, and a phone-sized view of everything the Brain knows. Seven tabs — Brain, Now, Look, Messages, People, Memor">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%232cc79a' stroke-width='2.6' stroke-dasharray='56 20' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='4' r='3' fill='%232cc79a'/%3E%3C/svg%3E">
+<style>
+:root {
+  --bg: #04080a;
+  --surface: #0b1214;
+  --surface-2: #0e1618;
+  --border: #1c2a2e;
+  --border-soft: #141f22;
+  --ink: #ecf0f1;
+  --ink-2: #a8b8c0;
+  --ink-3: #6d7f87;
+  --teal: #2cc79a;
+  --teal-bright: #43e6b8;
+  --teal-dim: #1a7a60;
+  --attention: #e06b52;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+  --sidebar-w: 288px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink-2);
+  font: 16px/1.7 var(--sans);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(900px 420px at 18% -8%, rgba(44,199,154,.10), transparent 60%),
+    radial-gradient(720px 380px at 92% 0%, rgba(224,107,82,.05), transparent 60%);
+}
+
+/* ------------------------------------------------------------- sidebar */
+#nav-toggle { display: none; }
+.sidebar {
+  position: fixed; z-index: 40; top: 0; left: 0; bottom: 0;
+  width: var(--sidebar-w); overflow-y: auto; overscroll-behavior: contain;
+  background: rgba(8,13,15,.92); backdrop-filter: blur(10px);
+  border-right: 1px solid var(--border-soft);
+  padding: 22px 18px 40px;
+}
+.sidebar::-webkit-scrollbar { width: 8px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.brand {
+  display: flex; align-items: center; gap: 11px;
+  padding: 4px 8px 16px; margin-bottom: 10px;
+  border-bottom: 1px solid var(--border-soft);
+  text-decoration: none;
+}
+.brand svg { flex: none; }
+.brand .name {
+  color: var(--ink); font-weight: 700; font-size: 17px; letter-spacing: .2px;
+}
+.brand .tag {
+  display: block; color: var(--ink-3); font-size: 11px; font-weight: 400;
+  letter-spacing: .3px; margin-top: 1px;
+}
+.nav-section {
+  margin: 20px 8px 6px; font-size: 10.5px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--teal);
+  opacity: .85;
+}
+.sidebar a.page {
+  display: block; padding: 6px 10px; margin: 1px 0;
+  color: var(--ink-2); text-decoration: none; font-size: 13.5px;
+  border-radius: 8px; border-left: 2px solid transparent;
+}
+.sidebar a.page:hover { color: var(--ink); background: rgba(44,199,154,.06); }
+.sidebar a.page.active {
+  color: var(--teal-bright); background: rgba(44,199,154,.09);
+  border-left-color: var(--teal);
+}
+.sidebar .repo {
+  margin: 26px 8px 0; font-size: 12.5px;
+}
+.sidebar .repo a { color: var(--ink-3); text-decoration: none; }
+.sidebar .repo a:hover { color: var(--teal); }
+
+/* ------------------------------------------------------------- topbar */
+.topbar {
+  display: none; position: sticky; top: 0; z-index: 30;
+  align-items: center; gap: 12px;
+  background: rgba(4,8,10,.9); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-soft); padding: 12px 16px;
+}
+.topbar label {
+  display: inline-flex; flex-direction: column; gap: 4px; cursor: pointer;
+  padding: 6px;
+}
+.topbar label span {
+  display: block; width: 20px; height: 2px; background: var(--ink-2);
+  border-radius: 2px;
+}
+.topbar .t-name { color: var(--ink); font-weight: 700; font-size: 15px; }
+
+/* ------------------------------------------------------------- content */
+.main { position: relative; z-index: 1; margin-left: var(--sidebar-w); }
+.page-wrap { max-width: 828px; margin: 0 auto; padding: 52px 40px 40px; }
+.crumb {
+  font-size: 11px; font-weight: 700; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--teal); margin: 0 0 10px;
+}
+article h1 {
+  color: var(--ink); font-size: 37px; line-height: 1.15; letter-spacing: -.5px;
+  margin: 0 0 18px; font-weight: 750;
+}
+article h2 {
+  color: var(--ink); font-size: 23px; letter-spacing: -.2px;
+  margin: 44px 0 12px; padding-top: 18px;
+  border-top: 1px solid var(--border-soft); font-weight: 700;
+}
+article h3 { color: var(--ink); font-size: 17.5px; margin: 30px 0 8px; font-weight: 650; }
+article h4 { color: var(--ink); font-size: 15px; margin: 24px 0 6px; }
+article p { margin: 0 0 14px; }
+article a { color: var(--teal); text-decoration: none; border-bottom: 1px solid rgba(44,199,154,.3); }
+article a:hover { color: var(--teal-bright); border-bottom-color: var(--teal-bright); }
+article strong { color: var(--ink); font-weight: 650; }
+article ul, article ol { padding-left: 26px; margin: 0 0 14px; }
+article li { margin: 5px 0; }
+article li::marker { color: var(--teal-dim); }
+article hr { border: none; border-top: 1px solid var(--border-soft); margin: 32px 0; }
+article blockquote {
+  margin: 20px 0; padding: 14px 20px;
+  border-left: 3px solid var(--teal);
+  background: linear-gradient(90deg, rgba(44,199,154,.07), transparent 70%);
+  border-radius: 0 10px 10px 0; color: var(--ink);
+}
+article blockquote p { margin: 6px 0; }
+article code {
+  font-family: var(--mono); font-size: .85em;
+  background: var(--surface-2); border: 1px solid var(--border-soft);
+  border-radius: 6px; padding: 1.5px 6px; color: #9fe8cf;
+}
+article pre {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px 18px; overflow-x: auto;
+  margin: 18px 0; line-height: 1.55;
+}
+article pre code { background: none; border: none; padding: 0; color: #c9dbd4; font-size: 13px; }
+
+article img {
+  max-width: 100%; height: auto; border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #000; display: block; margin: 6px auto;
+  box-shadow: 0 8px 40px rgba(0,0,0,.5), 0 0 0 1px rgba(44,199,154,.04);
+}
+article p > img:only-child { margin: 20px auto; }
+article p:has(> img:only-child) + p > em:only-child,
+article img + em { color: var(--ink-3); font-size: 13px; }
+
+article table {
+  width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px;
+  display: block; overflow-x: auto;
+}
+article th {
+  text-align: left; color: var(--teal); font-size: 11.5px;
+  text-transform: uppercase; letter-spacing: .08em;
+  border-bottom: 1px solid var(--border); padding: 8px 14px 8px 0;
+  white-space: nowrap;
+}
+article td {
+  border-bottom: 1px solid var(--border-soft);
+  padding: 9px 14px 9px 0; vertical-align: top;
+}
+article td img { margin: 4px 0; min-width: 130px; }
+article tr:last-child td { border-bottom: none; }
+
+/* ------------------------------------------------------------- footer nav */
+.pagenav {
+  display: flex; gap: 14px; margin-top: 56px;
+  border-top: 1px solid var(--border-soft); padding-top: 22px;
+}
+.pagenav a {
+  flex: 1; display: block; padding: 14px 18px; text-decoration: none;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; transition: border-color .15s ease;
+}
+.pagenav a:hover { border-color: var(--teal-dim); }
+.pagenav .dir { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.pagenav .ttl { color: var(--ink); font-weight: 600; font-size: 14.5px; margin-top: 3px; }
+.pagenav a.next { text-align: right; }
+.foot {
+  margin: 44px 0 0; color: var(--ink-3); font-size: 12.5px;
+  border-top: 1px solid transparent; padding-top: 8px;
+}
+.foot a { color: var(--ink-3); }
+.foot a:hover { color: var(--teal); }
+
+/* ------------------------------------------------------------- mobile */
+@media (max-width: 980px) {
+  .topbar { display: flex; }
+  .sidebar { transform: translateX(-100%); transition: transform .22s ease; }
+  #nav-toggle:checked ~ .sidebar { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .page-wrap { padding: 30px 20px 28px; }
+  article h1 { font-size: 29px; }
+  .pagenav { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+<input type="checkbox" id="nav-toggle">
+<nav class="sidebar">
+  <a class="brand" href="index.html"><svg width='30' height='30' viewBox='0 0 32 32' aria-hidden='true'><circle cx='16' cy='16' r='12' fill='none' stroke='#2cc79a' stroke-width='2.4' stroke-dasharray='56 20' stroke-linecap='round'/><circle cx='16' cy='4' r='3' fill='#43e6b8'/></svg>
+    <span><span class="name">DreamLayer</span>
+    <span class="tag">A memory layer for the real world</span></span></a>
+  <a class="page" href="index.html">DreamLayer</a>
+  <div class="nav-section">Using DreamLayer</div>
+  <a class="page" href="guide/start-here.html">Start here</a>
+  <a class="page" href="guide/setup.html">Setting up</a>
+  <a class="page" href="guide/a-day-with-dreamlayer.html">A day with DreamLayer</a>
+  <a class="page" href="guide/talking-to-juno.html">Talking to it</a>
+  <a class="page" href="guide/cards.html">What just appeared on my glasses?</a>
+  <a class="page" href="guide/truth.html">The fact-checker</a>
+  <a class="page" href="guide/privacy.html">Your privacy</a>
+  <a class="page" href="guide/apps.html">The phone and the Mac</a>
+  <a class="page" href="guide/faq.html">Questions people ask</a>
+  <div class="nav-section">Under the hood</div>
+  <a class="page" href="architecture.html">Ecosystem architecture</a>
+  <a class="page" href="glasses-experience.html">The glasses experience</a>
+  <a class="page" href="simulator.html">The Halo Simulator</a>
+  <a class="page" href="hud-cards.html">HUD cards — the full gallery</a>
+  <a class="page" href="meridian.html">Meridian — the design language</a>
+  <a class="page" href="juno.html">Juno</a>
+  <a class="page" href="perception-memory.html">Perception and memory</a>
+  <a class="page" href="truth.html">Truth and discernment</a>
+  <a class="page" href="attention-focus.html">Attention and focus</a>
+  <a class="page" href="world-lenses.html">Scholar and TasteLens — the World lenses</a>
+  <a class="page" href="lenses.html">The six lenses and the wider set</a>
+  <a class="page" href="progression.html">Progression — the Saga</a>
+  <a class="page" href="privacy.html">Privacy and control</a>
+  <a class="page active" href="phone-app.html">The phone app</a>
+  <a class="page" href="brain-app.html">The desktop Brain app</a>
+  <a class="page" href="ai-brain.html">The AI Brain deep dive</a>
+  <a class="page" href="integrations.html">Integrations and capabilities</a>
+  <a class="page" href="platform.html">The platform — plugins, the mesh, and the store</a>
+  <a class="page" href="lens-builder.html">The Lens Builder — lenses without code</a>
+  <a class="page" href="community.html">The community layer — gallery, Golf, Jams</a>
+  <a class="page" href="sdk.html">The SDK — plugins with code</a>
+  <a class="page" href="cloud.html">DreamLayer Cloud</a>
+  <div class="nav-section">Reference</div>
+  <a class="page" href="reference/settings.html">Settings and modes</a>
+  <a class="page" href="reference/endpoints.html">Brain HTTP API</a>
+  <a class="page" href="reference/cards.html">Card catalog</a>
+  <a class="page" href="reference/earcons.html">Earcons and haptics</a>
+  <div class="nav-section">Appendix</div>
+  <a class="page" href="hardware-seams.html">Hardware and seams</a>
+  <a class="page" href="builders.html">For builders</a>
+  <a class="page" href="open-source.html">Open source</a>
+  <a class="page" href="glossary.html">Glossary</a>
+  <div class="repo"><a href="https://github.com/LetsGetToWorkBro/dreamlayer-docs">Source on GitHub</a></div>
+</nav>
+<div class="main">
+  <div class="topbar">
+    <label for="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></label>
+    <span class="t-name">DreamLayer</span>
+  </div>
+  <div class="page-wrap">
+    <p class="crumb">Under the hood</p>
+    <article>
+<h1 id="the-phone-app">The phone app</h1>
+<p>The phone app (<code>phone-app/</code>, Expo / React Native, TypeScript strict) is the
+remote control and the pocket brain: pairing, the three switches, every
+toggle, message approval, and a phone-sized view of everything the Brain
+knows. Seven tabs — <strong>Brain, Now, Look, Messages, People, Memories,
+Settings</strong> — plus hidden screens reached from Settings and Now (Brief,
+Plugins, Waypath, Capabilities, Device Vitals, Feel, Rewind, Saga, Profile,
+Rehearsal, Confluence, and the Cloud and Brain-tier views) and a five-step
+onboarding.</p>
+<p><em>Every screenshot in this chapter is the real app: the repository's code
+exported to web (<code>npx expo export --platform web</code>) and captured headlessly
+at phone size, running in </em><em>Demo Mode</em><em> — the app's own labeled sample data
+(see below), which is exactly what a new user sees when they tap "Explore
+with sample data". Nothing is mocked up; the fixtures ship in the app.</em></p>
+<h2 id="demo-mode--alive-with-no-hardware">Demo Mode — alive with no hardware</h2>
+<p><code>enableDemo()</code> in the brain store flips one flag and the whole app fills:
+every store getter serves labeled fixtures (<code>src/demo/fixtures.ts</code> — a
+plausible day of briefs, people, memories, messages, saga progress, rewind
+blocks) whenever <code>demoMode</code> is on, the glasses card shows a connected
+<code>HALO-DEMO</code>, and a persistent <strong>DemoBanner</strong> sits at the top of every
+screen with a one-tap exit, so sample data can never be mistaken for your
+life. Fixtures use fixed timestamps — nothing is generated, nothing is
+fetched. Exiting demo restores the honest empty states. It is reachable
+from onboarding and from Settings.</p>
+<h2 id="state-one-store">State: one store</h2>
+<p><code>src/state/useBrainStore.ts</code> (Zustand) is the source of truth for
+connections and toggles; three sibling stores carry the newer surfaces —
+<code>usePeopleStore</code> (the social memory), <code>usePluginStore</code> (the plugin store;
+the phone never runs plugin code, it posts install intent to the paired
+Brain), and <code>useRehearsalStore</code> (the live Reality Compiler bridge). The
+brain store holds:
+connection state for the Mac mini (URL, token, relay URL) and glasses, the
+three switches, and every toggle. A whitelisted snapshot persists to
+AsyncStorage under the key <code>dreamlayer.brain.v1</code> and rehydrates on launch.
+Two derived reads keep the UI honest: <code>brainKind()</code> ("phone" until a Mac is
+connected) and <code>effectiveCloud()</code> (always false while incognito).</p>
+<p>Server calls go through <code>brainFetch</code>: try the LAN URL from pairing; on
+failure, fall back to the relay URL if one was paired. <strong>Seam:</strong> the relay
+itself — host any secure tunnel to the Brain and put its URL in the pairing
+bundle; the client already prefers LAN and falls back. Setting the cloud or
+incognito switch also syncs the Brain (<code>POST /dreamlayer/config</code> with
+<code>cloud_enabled</code> / <code>network_mode</code>), so phone and panel never disagree.</p>
+<p>Three newer pieces make that connection honest under real-world networks:</p>
+<ul>
+<li><strong>One connection truth</strong> (<code>src/state/useConnectionStore.ts</code>) — a single
+  reachability store with four states and four plain labels: "Brain:
+  home", "Brain: away — via relay", "Brain: unreachable — still
+  remembering locally", "No Brain paired". Two consecutive probe failures
+  flip it offline; one success recovers it instantly.</li>
+<li><strong>The config outbox</strong> — a settings change that cannot reach the Brain is
+  merged, persisted, and kept as <em>pending sync</em> (never silently dropped);
+  the moment the connection store sees a recovery, the outbox drains.</li>
+<li><strong>Offline caches</strong> — the Memories and People stores hydrate from their
+  last-known snapshots on launch, so the app shows what it knew before any
+  network round-trip.</li>
+</ul>
+<h2 id="brain--the-hub-tab">Brain — the hub tab</h2>
+<p><img alt="Brain tab" src="assets/phone/brain.png" /></p>
+<p>The default landing tab:</p>
+<ul>
+<li><strong>Pair a device</strong> — scan the panel's QR (expo-camera, with a paste
+  fallback) or paste the <code>dreamlayer:</code> code; one code wires Mac mini and
+  glasses at once, with success haptics.</li>
+<li><strong>Devices</strong> — Glasses (status, forget) and Mac mini (status, its three
+  benefit bullets, connect/disconnect — "Use phone as brain instead").</li>
+<li><strong>Reach</strong> — the Cloud switch, disabled while incognito.</li>
+<li><strong>Privacy</strong> — Incognito and Pause memory capture.</li>
+<li><strong>Ask your brain</strong> — a query box straight to <code>POST /dreamlayer/brain/ask</code>,
+  rendering the answer with its tier.</li>
+<li><strong>Upcoming</strong> (when a Mac is connected) — agenda from the Brain, calendar
+  sync button, quick add.</li>
+<li><strong>Recent activity</strong> (when connected) — the first eight items of the
+  unified feed.</li>
+<li><strong>What your brain can do</strong> — the six-lens overview.</li>
+</ul>
+<h2 id="now--the-live-mirror">Now — the live mirror</h2>
+<p><img alt="Now tab" src="assets/phone/now.png" /></p>
+<p>What the glasses are doing right now: a <strong>HaloMirror</strong> stage showing the last
+card (or the paused state), a Live/Paused status pill, the latest morning
+brief, a voice-command box that routes the same intents as Juno
+(brief / answer / reply), and quick actions (brief, ask, pause/resume
+capture). It polls <code>GET /dreamlayer/brief/latest</code> every 90 seconds and fires
+a local notification when a genuinely new brief arrives.</p>
+<h2 id="look--the-deliberate-camera-tier">Look — the deliberate camera tier</h2>
+<p><img alt="Look tab" src="assets/phone/look.png" /></p>
+<p>New enough to have earned a tab: point the phone at anything and one
+photo rides <code>POST /dreamlayer/brain/explain</code> — the same pipeline the
+glasses use, with the answer stamped by the tier that produced it
+("answered by: laptop"). The camera module loads lazily; no camera or no
+permission degrades to an honest empty state ("No camera here"), never a
+crash — which is exactly what the web export above shows.</p>
+<h2 id="messages--hands-free-relay">Messages — hands-free relay</h2>
+<p><img alt="Messages tab" src="assets/phone/messages.png" /></p>
+<p>The Brain's Messages and Mail feed (12-second poll), with per-channel local
+notifications. Tapping a message opens the reply pane: three AI-suggested
+replies (<code>POST /dreamlayer/replies</code>) as tap-to-fill chips, then <strong>Approve and
+send</strong> — which is the only send path, and it posts <code>approved: true</code>
+explicitly. Gated empty states cover no-Mac, relay-off, and no-messages.</p>
+<h2 id="people--your-social-memory">People — your social memory</h2>
+<p><img alt="People tab" src="assets/phone/people.png" /></p>
+<p>Everything the Social Lens knows, readable and editable: search across
+names, relationships, and notes; per-person cards with the relationship
+line, last seen, expandable notes (add or remove by hand), the topics you
+two return to, and open debts in a coral box with a one-tap <strong>Settle up</strong>.
+It reads the Brain's mirror (<code>GET /dreamlayer/social/people</code>) and edits
+through <code>POST /dreamlayer/social/people/edit</code> — the same record the glasses
+build when you say "this is my colleague Sarah" or "Marcus owes me $20".
+The footer states the contract: your own contacts only, never a stranger
+lookup.</p>
+<h2 id="memories--recall-grouped-by-day">Memories — recall, grouped by day</h2>
+<p><img alt="Memories tab" src="assets/phone/memories.png" /></p>
+<p>Today / Yesterday / Earlier groups, kind-colored (promise, person, object,
+place, note), with local search — and now backed by the real thing: with a
+Mac connected it pulls <code>GET /dreamlayer/memories</code>, the Brain's assembled
+recall (saved places from Waypath, people met, owed favors, dated
+reminders), merged with the local store. The search box gains a second
+stage too: ask your files and mail, rendered as a "From your Brain" card
+with sources.</p>
+<h2 id="settings--every-toggle">Settings — every toggle</h2>
+<table>
+<thead>
+<tr>
+<th>Privacy and relay</th>
+<th>Juno</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="Settings" src="assets/phone/settings.png" /></td>
+<td><img alt="Juno settings" src="assets/phone/settings_juno.png" /></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Privacy:</strong> Proactive cards with nested Events / People / Places cues,
+  Focus mode, Incognito, Text pop-ups, Email pop-ups, Summarize long emails,
+  Pause memory capture.</li>
+<li><strong>Juno:</strong> the wake word (fixed "Hey Juno" today), Proactive alerts,
+  Live fact-checker (Veritas), Answer-ahead, wake sources (voice, tap, gaze,
+  raise), and listening feedback (visual, audio, haptic).</li>
+<li><strong>Devices and brain:</strong> glasses status and the link to the Brain tab.</li>
+<li><strong>Labs:</strong> Saga, Profile, Rewind, Rehearsal, Confluence — joined by
+  Waypath, Capabilities, Device Vitals, and Feel (below), plus "What the
+  cloud can see" and the live Brain tier ladder.</li>
+<li><strong>Explore:</strong> the Demo Mode switch ("Explore the whole app with labeled
+  sample data — no glasses or Mac needed").</li>
+<li><strong>Danger zone:</strong> Erase all memories (confirmed) — it clears the local
+  memory store <em>and</em> reaches the paired Brain
+  (<code>POST /dreamlayer/memories/purge</code>), which drops every saved place while
+  deliberately leaving people and reminders (they are mirrors of their own
+  surfaces with their own remove controls).</li>
+</ul>
+<p>The full toggle-to-effect table, with defaults and the endpoints each drives,
+is in <a href="reference/settings.html">Settings and modes</a>.</p>
+<h2 id="labs-screens">Labs screens</h2>
+<table>
+<thead>
+<tr>
+<th>Rewind</th>
+<th>Saga</th>
+<th>Profile</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="Rewind" src="assets/phone/rewind.png" /></td>
+<td><img alt="Saga" src="assets/phone/saga.png" /></td>
+<td><img alt="Profile" src="assets/phone/profile.png" /></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Rewind</strong> — today's hour blocks from <code>GET /dreamlayer/rewind</code> (the same
+  day the glasses scrub), color-coded by kind.</li>
+<li><strong>Saga</strong> — rank, XP bar, and the achievement ledger; see
+  <a href="progression.html">Progression</a>.</li>
+<li><strong>Profile</strong> — "What Juno knows about you": the mirrored user model.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Rehearsal</th>
+<th>Confluence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="Rehearsal" src="assets/phone/rehearsal.png" /></td>
+<td><img alt="Confluence" src="assets/phone/confluence.png" /></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Rehearsal</strong> — the Reality Compiler studio, now <strong>live end to end</strong>:
+  every beat you perform (tap, double, hold, or a spoken beat via the
+  keyboard's dictation) round-trips <code>POST /dreamlayer/rc/rehearse</code>, the
+  score and budget proof render from the Brain's real reply, Keep signs the
+  figment into the vault, and Arm / Revoke drive
+  <code>rc/deploy</code> / <code>rc/revoke</code>. The remaining seam has narrowed: the whole
+  loop — including a running lens talking back to the Brain — is closed
+  and tested in TypeScript; what's left is the native BLE transport
+  itself, so deploys record their exact envelopes until a Halo attaches.</li>
+<li><strong>Brief</strong> — the extended morning brief, in sections (Today, Due, Waiting
+  on you, Messages, Yesterday), composed on demand via
+  <code>POST /dreamlayer/brief</code> with <code>depth: "long"</code> and stored to read offline.
+  Reached from the Now tab's brief card.</li>
+</ul>
+<p><img alt="Brief screen" src="assets/phone/brief.png" /></p>
+<ul>
+<li><strong>Plugins</strong> — the store: browse and search the registry, Featured / Top
+  rated / Downloads tabs, one-tap star ratings, and a permissions alert
+  before any install. Installs are real now: the phone fetches the package
+  and <strong>sideloads</strong> it to the paired Brain, surfacing the Brain's actual
+  validation verdict; with no Brain paired the install queues locally and
+  <code>flushPending</code> delivers it the moment one pairs. See
+  <a href="platform.html#the-store-in-three-places">The platform</a>.</li>
+<li><strong>Confluence</strong> — the bond lifecycle (propose, accept, live), togetherness,
+  TinCan pings, weather gifts. Presentational until live bond streaming
+  lands.</li>
+</ul>
+<h2 id="the-new-labs-screens">The new Labs screens</h2>
+<table>
+<thead>
+<tr>
+<th>Waypath</th>
+<th>Feel</th>
+<th>Capabilities</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="Waypath" src="assets/phone/waypath.png" /></td>
+<td><img alt="Feel" src="assets/phone/packs.png" /></td>
+<td><img alt="Capabilities" src="assets/phone/capabilities.png" /></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Waypath</strong> — "one point of light — no map, no maps app." Enter (or use)
+  your location and a destination; a real OSRM route (the default public
+  server, self-hostable — the router URL is a swap-in seam) becomes a
+  single dot on a ring plus a distance line ("28 m to the next turn"),
+  bearing-corrected as you move. A <strong>"Simulate the walk"</strong> link ticks a
+  fake GPS along the actual route so the whole screen is demoable at a
+  desk — that is exactly how the screenshot above was taken.</li>
+<li><strong>Feel</strong> — the earcon/haptic pack picker. Two bundled packs today
+  (Glass, the default; Analog, weightier), applied app-wide and persisted;
+  the footer states the contract: "Every pack passes the same sensory
+  gate — patterns ≤400ms, the silent signal stays silent."</li>
+<li><strong>Capabilities</strong> — the phone-sized view of
+  <a href="integrations.html">the capability report</a>: what your paired Brain can
+  also learn to do, sorted by impact, with the honest footer "the phone
+  never installs code." Shown unpaired above — its real content needs a
+  Mac on the LAN.</li>
+<li><strong>Device Vitals</strong> — the audience for the glasses' TEL telemetry frames:
+  heap now/peak with a text sparkline, crash and veil counts, cards
+  shown/dismissed rates, figments banished. Empty ("No telemetry yet")
+  until real glasses stream it — the honest pre-hardware state.</li>
+<li><strong>What the cloud can see</strong> and <strong>Brain — the tier ladder</strong> — two small
+  trust screens: the first renders <code>GET /dreamlayer/cloud</code> (see
+  <a href="cloud.html">DreamLayer Cloud</a>); the second renders
+  <code>GET /dreamlayer/brain/tiers</code> — every tier with its measured latency and
+  reliability, and a swap control. That ladder is the
+  <strong>Bring-Your-Own-Brain ceremony</strong>: the moment a Mac joins, you <em>watch</em>
+  answers get faster and richer, tier by tier.</li>
+</ul>
+<h2 id="onboarding">Onboarding</h2>
+<p><img alt="Onboarding" src="assets/phone/onboarding.png" /></p>
+<p>Five steps — welcome, how it works, recall, privacy, pair — with animated
+transitions, the pairing ring, and QR scan. Finishing (or skipping) lands on
+the Brain tab.</p>
+<h2 id="services-and-design-system">Services and design system</h2>
+<ul>
+<li><strong>Notifications</strong> (<code>src/services/notify.ts</code>) — permission-memoized local
+  pushes for new briefs and messages; silent no-op on web or without
+  permission. <strong>Seam:</strong> on a real device, <code>expo-notifications</code> needs install
+  permission granted.</li>
+<li><strong>Pairing codec</strong> (<code>src/services/pairing.ts</code>) — the <code>dreamlayer:</code> code,
+  byte-compatible with the Python implementation.</li>
+<li><strong>Earcons</strong> (<code>src/services/sound.ts</code>) — the app ships the actual sound
+  files (<code>assets/sounds/</code>: two "hey" wakes, two listens, two watch-outs, two
+  looks, two chimes) with variant rotation that never repeats back-to-back.</li>
+<li><strong>Haptics</strong> (<code>src/services/haptics.ts</code>) — no longer four buzzes but a
+  <strong>data-driven vocabulary</strong> of fourteen named signals (confirm, action,
+  attention, interrupt, veil_on/veil_off ramps, commitment_crack and
+  _bloom, truth_flag, figment_deployed — and answer_ahead, which is
+  <em>silence by design</em>), every pattern at most ~400 ms, plus TinCan
+  replaying the sender's actual tap rhythm. The full table is in
+  <a href="reference/earcons.html#the-phone-haptic-vocabulary">Earcons and haptics</a>.</li>
+<li><strong>The BLE bridge</strong> (<code>src/ble/</code>) — the glasses wire, in pure TypeScript:
+  <code>framing.ts</code> is the 4-byte length-prefix protocol ported byte-for-byte
+  from Python (pinned to Python-generated vectors), and <code>bridge.ts</code> is a
+  transport-injected state machine — MTU chunking, streaming reassembly,
+  reconnect backoff (0.5 s doubling to 8 s), and routing of inbound cards,
+  figment acks, lens emits, and TEL telemetry. <strong>Seam:</strong> the native
+  adapter (<code>transport.blePlx.ts</code>, react-native-ble-plx) loads lazily,
+  returns null in Expo Go/web, and still carries placeholder service UUIDs
+  marked for the bench — the real IDs need a Halo on a desk.</li>
+<li><strong>The lens relay</strong> (<code>src/services/lensRelay.ts</code>) — closes the
+  glass-to-Brain-to-glass loop: a running lens's rate-limited emit rides
+  the bridge to <code>POST /dreamlayer/rc/emit</code> (an <code>ask</code> emit runs the Brain
+  and pushes the answer back), and host text streams into the lens's slot
+  via <code>rc/feed</code>. See <a href="lens-builder.html#the-loop-glass-to-brain-and-back">the Lens Builder</a>.</li>
+</ul>
+<h3 id="design-system">Design system</h3>
+<p><code>src/ui/</code> implements the DESIGN.md doctrine: dark and luminous (background
+black, surface <code>#0E1416</code>, memory teal <code>#2FD4C4</code>, attention coral, one accent
+per surface), an 8 pt spacing grid, a five-level type scale with an eyebrow
+style, and motion tokens (180/240/400 ms, one standard ease) with
+<code>useEntrance</code> fade-and-rise and <code>usePressScale</code> spring on every touchable.</p>
+<p>The recent material overhaul raised the finish without touching the
+doctrine: the whole app now sets in <strong>Space Grotesk</strong> (the brand face,
+shared with the landing page; loaded via <code>@expo-google-fonts/space-grotesk</code>
+with the weights mapped explicitly in <code>src/ui/theme/fonts.ts</code>, since custom
+RN fonts ignore <code>fontWeight</code>), surfaces gained real depth through
+<code>expo-blur</code> and <code>expo-linear-gradient</code> (the <code>CineBackdrop</code> ambient
+gradient behind every screen), and the tab bar draws its own <code>TabIcon</code>
+set instead of the platform defaults.</p>
+<p>Primitives: <code>Screen</code>, <code>ScreenHeader</code>, <code>Card</code>, <code>Section</code>, <code>Tappable</code>,
+<code>EmptyState</code>, <code>StatusPill</code>, <code>PillButton</code>, <code>ConnectorCard</code> with <code>SwitchRow</code>
+and <code>Bullet</code>, <code>QrScanner</code>, <code>PrimaryButton</code>, <code>DemoBanner</code>, plus the
+HUD-mirror components (<code>HaloMirror</code>, <code>CardPreview</code>, <code>DreamCanvas</code>,
+<code>HorizonPreview</code>) that reuse the glasses' exact palette as QA truth.</p>
+<h2 id="the-app-store-kit">The App Store kit</h2>
+<p>The package now carries everything a store submission needs, checked into
+the repo rather than living in someone's browser session:</p>
+<ul>
+<li><strong>fastlane</strong> (<code>phone-app/fastlane/</code>): Appfile, Fastfile, and a
+  Deliverfile driving <code>deliver</code>, with full metadata (name, subtitle,
+  description, keywords, categories, review notes) under
+  <code>fastlane/metadata/</code> in <strong>nine locales</strong> — en-US, de-DE, es-ES, fr-FR,
+  it, ja, ko, pt-BR, zh-Hans — plus a screenshots directory in the layout
+  <code>deliver</code> expects.</li>
+<li><strong>In-app i18n</strong> (<code>src/i18n/</code>): the same nine languages for the UI
+  strings, with English as the fallback for any missing key; tab titles
+  and screens read through <code>t()</code>.</li>
+<li><strong>Privacy:</strong> every locale's <code>privacy_url.txt</code> points at the real policy,
+  <code>https://dreamlayer.app/privacy.html</code>, served from the landing site in
+  this repository.</li>
+</ul>
+<h2 id="running-it">Running it</h2>
+<pre><code class="language-bash">cd phone-app
+npm install
+npx expo start        # scan the QR with Expo Go (iOS/Android)
+npx tsc --noEmit      # typecheck (strict)
+npm test              # the phone's own test suite
+</code></pre>
+<p>The package finally has its own test suite: <strong>Jest, run as two projects</strong> —
+"logic" (ts-jest over the pure-TS stores, services, BLE framing/bridge,
+pairing) and "component" (jest-expo with React Native Testing Library over
+the screens) — 103 test cases across 19 files at time of writing,
+covering the framing parity vectors, the reconnect state machine, the
+connection store's hysteresis, the outbox, Waypath geometry and routing,
+the pack gate, and the new screens. <code>tsc --noEmit</code> remains the standing
+typecheck, and the pairing codec's Python twin is still pinned by the
+host suite.</p>
+    </article>
+    <div class="pagenav"><a class="prev" href="privacy.html"><span class="dir">Previous</span><span class="ttl">Privacy and control</span></a><a class="next" href="brain-app.html"><span class="dir">Next</span><span class="ttl">The desktop Brain app</span></a></div>
+    <p class="foot">DreamLayer knowledge base. Every image is rendered by the
+    product's own pipeline. <a href="https://github.com/LetsGetToWorkBro/dreamlayer-docs">Site repository</a></p>
+  </div>
+</div>
+</body>
+</html>
