@@ -355,10 +355,19 @@ composed, without one the top passages speak for themselves. Veil-gated
 like every lens. (Tests: <code>test_docent.py</code>.)</p>
 <h2 id="rosetta-live--the-ear-offline">Rosetta Live — the ear, offline</h2>
 <p>Rosetta the eye translates what you <em>look at</em>; <strong>Rosetta Live</strong>
-(<code>translate_heard</code>) translates what someone is <em>saying</em> — one caption card
-per utterance, in your language, <strong>fully offline</strong> when the Argos
-translation pack is installed. Nothing is recorded, nothing leaves, and
-incognito silences it entirely. (Tests: <code>test_rosetta_live.py</code>.)</p>
+(<code>translate_heard</code>) translates what someone is <em>saying</em> — in your
+language, <strong>fully offline</strong> when the Argos translation pack is installed.
+Nothing is recorded, nothing leaves, and incognito silences it entirely.</p>
+<p>It was also the pilot for the platform's new
+<a href="sdk.html#the-output-shape-rule-adr-0002">output-shape rule</a>: instead of
+flashing one caption card per utterance, the translate path now deploys a
+single <strong>Rosetta figment</strong> — three named slots on one screen
+(<code>{slot:langs}</code> "ES → EN", <code>{slot:translation}</code> in primary type,
+<code>{slot:original}</code> beneath) — refreshed in place as each utterance lands,
+dismissed with a long press. One lens, reused across the whole
+conversation; the caption card survives only for the raw transcript role.
+(Tests: <code>test_rosetta_live.py</code>, plus the device-Lua stage drawing all
+three slots.)</p>
 <h2 id="on-the-glass">On the glass</h2>
 <p>All three now render on the device itself: Scholar and Taste share the
 World-lens bed (glass pane, bloomed spring-in cue dot, gradient separator,

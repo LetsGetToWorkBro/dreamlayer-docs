@@ -615,12 +615,12 @@ exist in code beyond the summary tables in <code>docs/INTEGRATION.md</code>.</p>
 <tr>
 <td><code>/dreamlayer/rc/feed</code></td>
 <td>token</td>
-<td><code>{text, source?}</code> → stream one line into the running lens's <code>{slot}</code>; refused with no lens on stage</td>
+<td><code>{text, source?}</code> → stream one line into the running lens's default <code>{slot}</code>; refused with no lens on stage (named slots are fed by the orchestrator's bridge)</td>
 </tr>
 <tr>
 <td><code>/dreamlayer/rc/emit</code></td>
 <td>token</td>
-<td><code>{tag, text?}</code> → the lens speaks back; <code>tag: "ask"</code> runs the Brain and pushes the answer into the slot</td>
+<td><code>{tag, text?}</code> → the lens speaks back under the capability contract: <code>ask</code>/<code>translate</code>/<code>look</code> run only if the signed figment declared them in <code>requires</code> (refused by name otherwise); unregistered tags are acknowledged as free local signals</td>
 </tr>
 <tr>
 <td><code>/dreamlayer/event/&lt;name&gt;</code></td>

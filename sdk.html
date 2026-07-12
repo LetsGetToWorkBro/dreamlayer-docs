@@ -366,6 +366,63 @@ delivered, RPC calls made), surfaced in the health snapshot. Its honesty
 is stated in the module itself: in-process plugins' raw network/file
 access is not intercepted — the log is complete only for the isolated and
 mediated surfaces.</p>
+<h2 id="figments-have-a-contract-too">Figments have a contract too</h2>
+<p>Plugins are not the only third-party surface with declared powers — the
+figment grammar grew its own, deliberately tiny pair:</p>
+<ul>
+<li><strong>Named slots.</strong> Beyond the default <code>{slot}</code>, a lens can address up to
+  <strong>eight named channels</strong> — <code>{slot:translation}</code>, <code>{slot:langs}</code> — each
+  still one 24-character line, still host-fed (a slot fill is a <code>text</code>
+  event, so it adds zero autonomous budget). The grammar is identical in
+  all three interpreters — Python stage, device Lua, browser <code>figment.js</code>
+  — and parity-tested across them.</li>
+<li><strong>The emit-capability registry</strong> (<code>reality_compiler/v2/capabilities.py</code>).
+  Three emit tags are host powers with plain-language summaries: <code>ask</code>,
+  <code>translate</code> (passive — the Brain fills a slot; the lens emits nothing),
+  and <code>look</code>. A lens must declare what it invokes in <code>meta.requires</code>,
+  which rides the signed canonical bytes — the figment twin of a plugin
+  manifest's <code>requires</code>. The verifier enforces declared-covers-emitted
+  before signing; the Brain re-checks at runtime and refuses an
+  undeclared power by name. Unregistered tags remain free local signals.
+  The safety card and every store listing surface the declared powers as
+  an "asks your Brain to" list.</li>
+</ul>
+<h2 id="the-output-shape-rule-adr-0002">The output-shape rule (ADR 0002)</h2>
+<p>A second design record fixes <em>what shape new output ships in</em>:</p>
+<table>
+<thead>
+<tr>
+<th>The behavior is...</th>
+<th>Ship it as</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a self-contained on-glass machine that owns the screen — text, state, host-fed slots, no novel geometry</td>
+<td><strong>a figment</strong></td>
+<td>zero renderer twin to maintain; budget-proven; signed; parity for free</td>
+</tr>
+<tr>
+<td>a transient overlay with custom geometry over whatever holds focus (the veil slam, a hark, the truth gauge)</td>
+<td><strong>a card</strong></td>
+<td>needs a bespoke draw and must not seize the stage</td>
+</tr>
+<tr>
+<td>a host power a lens invokes, not a screen</td>
+<td><strong>an emit capability</strong></td>
+<td>the reaction is host-side; the screen is whatever lens declared it</td>
+</tr>
+</tbody>
+</table>
+<p>The headline: <em>new world-facing text output is a figment by default; a
+card is now the exception</em>, justified by custom geometry plus overlay
+semantics. Rosetta Live was the migration pilot
+(<a href="world-lenses.html#rosetta-live--the-ear-offline">World lenses</a>), the
+how-to lives in <code>docs/rc_v2/figment_migration.md</code> (step five is "retire
+the twin"), and the ADR names the next text-shaped candidates: the live
+caption, upcoming, here, and morning-brief cards. A test pins the
+decision — the docs' existence included.</p>
 <h2 id="your-memory-is-a-file">Your memory is a file</h2>
 <p>The data-trinity commands treat your memory store as what it is — one
 SQLite file you own:</p>

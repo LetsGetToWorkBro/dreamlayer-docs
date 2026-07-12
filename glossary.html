@@ -320,6 +320,9 @@ article tr:last-child td { border-bottom: none; }
   <a href="lenses.html">Lenses</a></li>
 <li><strong>Earcon</strong> — a short identity sound (wake, hark, hark_urgent, look, chime).
   <a href="reference/earcons.html">Earcons</a></li>
+<li><strong>Emit capability</strong> — a host power a lens may invoke (<code>ask</code>,
+  <code>translate</code>, <code>look</code>), usable only if declared in its signed <code>requires</code>.
+  <a href="sdk.html#figments-have-a-contract-too">SDK</a></li>
 <li><strong>Figment</strong> — a signed, budget-verified little program the Reality
   Compiler runs on the glass stage.</li>
 <li><strong>Figment Golf</strong> — build the described behavior in the fewest bytes;
@@ -363,8 +366,13 @@ article tr:last-child td { border-bottom: none; }
   particles, parallax. <a href="meridian.html">Meridian</a></li>
 <li><strong>Meridian</strong> — the HUD design language; "the display is a place, not a
   stage."</li>
-<li><strong>Juno</strong> — the voice: wake, commands, persona, and the user model.
-  <a href="juno.html">Juno</a></li>
+<li><strong>Named slot</strong> — <code>{slot:&lt;name&gt;}</code>: one of up to eight host-fed text
+  channels a lens can hold on one screen. <a href="sdk.html#figments-have-a-contract-too">SDK</a></li>
+<li><strong>Output-shape rule</strong> — ADR 0002: new text output is a figment by
+  default; a card must earn its bespoke renderer.
+  <a href="sdk.html#the-output-shape-rule-adr-0002">SDK</a></li>
+<li><strong>Juno</strong> — the assistant: wake, commands, persona, the user model — and
+  now a face (an animated character, labeled brand art). <a href="juno.html">Juno</a></li>
 <li><strong>Maturity arc</strong> — a fresh install earns its voice: OBSERVER, then
   APPRENTICE, then RESIDENT — demoted when over-dismissed.
   <a href="perception-memory.html#the-memory-substrate">Perception and memory</a></li>
