@@ -389,8 +389,10 @@ turned into one of eight human directions given your current heading —
 but the IMU heading and drop-distance that feed it are a <strong>seam</strong> today,
 so place-worded anchors ("at the north rack") are the real product and
 bearing-worded ones light up with hardware. Anchors are yours alone: a
-thing you never stashed has no waypath, and both stashing and locating
-hold while incognito.</p>
+thing you never stashed has no waypath. The privacy rule was sharpened by
+the recall-gate pass: <strong>stashing holds while incognito</strong> (it is a write),
+but <em>locating still answers</em> — incognito blocks keeping, not recalling —
+and only the full Veil (capture paused) holds the on-glass answer too.</p>
 <p>Scenes are kept through <code>ingest_scene</code> (object, place, time; embedded and
 stored in the vault), conversations through <code>ingest_conversation</code>; both
 confirm with the SavedMemoryCard. A passive ring buffer (<code>SilentCapture</code> +
@@ -414,7 +416,9 @@ is a single text row; no image is stored.</p>
   blobs, and every vector is stamped with its embedding-space signature so
   spaces never mix.</li>
 <li><strong>A persistent ANN index.</strong> HNSW over <code>usearch</code> (one sidecar file beside
-  the database, updated on every ingest) — because a linear scan breaks
+  the database, persisted in batches — every 64 mutations by default, with
+  an explicit flush on shutdown and after the retention sweep, an honest
+  and bounded crash window) — because a linear scan breaks
   inside year one of real use. Without <code>usearch</code> every query falls back to
   the exact linear cosine scan with identical scoring.</li>
 <li><strong>A retention lifecycle.</strong> Hot (a 24-hour ring, purged after REM), warm
@@ -510,6 +514,14 @@ lands. <strong>Seam:</strong> the glasses' wear/wake signal.</p>
 burst); forgetting is instant and confirmed (<strong>ForgetLastCard</strong>). Deeper
 retention — what consolidates overnight, what fades — belongs to REM and the
 memory vault, covered in <a href="lenses.html">the wider lens set</a>.</p>
+<p>Erasure itself grew three tested guarantees in the remediation waves:
+forgetting a memory <strong>evicts its vector</strong> from the ANN index, not just
+the database row; a full purge clears the place and entity tables too, so
+<strong>no location signature survives</strong> as residue; and the hub's
+<code>erase_all_memories</code> sweeps all eight stores that can hold a trace —
+memories and vectors, Ember engrams, the REM bias, Truth-Lens baselines,
+Social-Lens faces and dossiers, the conversation ledger, the user model,
+the hot ring, recurrence models, and Waypath anchors.</p>
 <p>Everything kept is also inspectable in one place:
 <code>GET /dreamlayer/memories</code> assembles the saved places (Waypath anchors),
 people met, owed favors, and dated reminders into a single feed — the

@@ -292,10 +292,10 @@ JSON dict over BLE.</p>
 <h3 id="2-the-orchestrator-the-hub--host-pythonsrcdreamlayerorchestrator">2. The orchestrator (the hub) — <code>host-python/src/dreamlayer/orchestrator/</code></h3>
 <p>The mind of the product, designed to run on the phone. One <code>Orchestrator</code>
 class coordinates everything — since the decomposition pass it is a thin
-coordinator composed of ten focused ops mixins (ingest, conversation,
+coordinator composed of twelve focused ops mixins (ingest, conversation,
 commitments, world lenses, brain switches, messages, dream/REM,
-confluence, Juno/attention, plugins), behavior-preserving and
-API-identical. It coordinates: the Juno voice assistant, the conversation
+confluence, Juno/attention, plugins, Ember, Stasis), behavior-preserving
+and API-identical. It coordinates: the Juno voice assistant, the conversation
 ledger and live captions, Veritas fact-checking, Truth Lens delivery reads,
 Discernment fusion, answer-ahead, the anticipation and attention engines,
 commitment capture, time-scrub rewind, the Social Lens, Dream Mode, and the
@@ -309,7 +309,11 @@ for written answers and vision, schedules the morning brief, tracks the Saga,
 and serves a full control panel as a single self-contained HTML page. Every
 request carries the pairing token header <code>X-DreamLayer-Token</code>; anything that
 exposes secrets, the filesystem, or outbound sends is additionally
-<strong>local-only</strong> (403 from off-box).</p>
+<strong>local-only</strong> (403 from off-box). The bind itself is now
+<strong>loopback-by-default</strong>: a bare run listens on 127.0.0.1 only, an empty
+token is trusted only from loopback, and exposing to the LAN
+(<code>--host 0.0.0.0</code>) mints a random pairing token if none is set — an
+unauthenticated network Brain can no longer exist.</p>
 <h3 id="4-the-phone-app--phone-app">4. The phone app — <code>phone-app/</code></h3>
 <p>Expo / React Native. Seven tabs (Brain, Now, Look, Messages, People,
 Memories, Settings) plus hidden screens (Brief, Plugins, Waypath,
@@ -328,7 +332,8 @@ Brain.</p>
 <h3 id="glasses---phone-ble">Glasses &lt;-&gt; phone: BLE</h3>
 <p>Framed JSON: a 4-byte big-endian length prefix, then UTF-8 JSON, reassembled
 across MTU fragments (<code>halo-lua/ble/protocol.lua</code>, mirrored by
-<code>host-python/src/dreamlayer/bridge/</code>). Every message has a <code>t</code> type field.
+<code>host-python/src/dreamlayer/bridge/</code> and the phone's pure-TS BLE core,
+<code>phone-app/src/ble/framing.ts</code> + <code>bridge.ts</code>). Every message has a <code>t</code> type field.
 Downstream: <code>card</code>, <code>command</code> (<code>show_ready</code>, <code>pause</code>, <code>resume</code>, <code>ask</code>, <code>wake</code>,
 <code>reset</code>), <code>horizon</code> frames, dream frames, <code>amp</code> (a ~15-byte live microphone
 amplitude used only while the listening card is up), palettes, sprites, and
@@ -429,9 +434,10 @@ implemented and covered by the test suite.</p>
 │       ├── bridge/        BLE bridge + the Lua raster harness (lupa)
 │       ├── simulator/     the Python Halo Simulator (the real stack, no glasses)
 │       ├── social_lens/ truth_lens/ object_lens/ lucid_recall/ ...
-│       └── tests/         2,302 collected tests
+│       └── tests/         3,022 collected tests
 │   └── packaging/         the macOS .dmg app (py2app, entitlements)
 ├── phone-app/             Expo / React Native app + the App Store kit
+├── reality-core/          the Rust figment interpreter core (native + wasm bindings)
 ├── laptop-companion/      minimal context agent + macOS Brain installer
 ├── examples/              hello-lens, the CI-tested plugin tutorial
 ├── registry/              the plugin marketplace catalog

@@ -288,7 +288,7 @@ Palette Cycling).</p>
 <tr>
 <td><strong>Memory</strong></td>
 <td>your life, remembered</td>
-<td>Dream Mode, Ghost Layer, Lucid Recall, REM, Yesterlight, Premonition, Waypath, Ember</td>
+<td>Dream Mode, Ghost Layer, Lucid Recall, REM, Yesterlight, Premonition, Waypath</td>
 </tr>
 <tr>
 <td><strong>People</strong></td>
@@ -413,11 +413,16 @@ real), hardening the model when a predicted event lands.</p>
   design: at most <strong>one</strong> memory, only one you <em>chose to keep</em> (pinned),
   from about a year ago today — and it stays silent entirely when your
   inner weather reads storm. It is now the <em>afterglow</em> of the full Ember
-  practice (<code>dreamlayer.ember</code>, docs/EMBER.md in the main repo): tend a
-  moment until it lives in you — cue-only prompts at the place it happened,
-  at spacing-effect intervals — then burn the recording with explicit
-  consent; the cue-only tombstone left behind is exactly what this card
-  resurfaces a year on, for you to answer from memory alone.</li>
+  practice (<code>dreamlayer.ember</code>, docs/EMBER.md): tend a moment until it
+  lives in you, burn the recording with explicit consent, and the cue-only
+  tombstone left behind is exactly what this card resurfaces a year on —
+  for you to answer from memory alone.</li>
+<li><strong>Stasis</strong> (<code>stasis</code>, docs/STASIS.md) — save states for your mind. A
+  double-nod (or <em>"hold that thought"</em>) freezes the moment you were
+  interrupted — the last thing you were saying, held <strong>verbatim</strong> — and
+  offers to put you back inside the doing when you return. It never
+  summarizes and never finishes your sentence; it returns your own cues
+  and trusts your cognition. No LLM in the loop, ever.</li>
 </ul>
 <h2 id="truths-siblings">Truth's siblings</h2>
 <ul>
@@ -504,8 +509,14 @@ query (face keywords route to the Social Lens; fact keywords to the memory
 index and the tiered brain) and returns one HUD card. The AI knowledge tier
 folds into it — "ask about your own stuff" <em>is</em> Lucid Recall extended from
 memory to your files and mail.</p>
-<h2 id="the-innovation-pass--ten-more-lenses">The Innovation pass — ten more lenses</h2>
-<p>Ten lenses added in the latest build. Each card below is the real renderer's
+<p>Once an unwired island (its memory index was, in the audit's own words,
+"implemented nowhere"), it is now genuinely part of the orchestrator:
+<code>orc.lucid_query(text, frame)</code> routes through a Retriever-backed index,
+is recall-gated like every other read, and its classifier upgrades to a
+dense semantic router when the semantic-recall extras are installed —
+falling back byte-identically to the keyword path otherwise.</p>
+<h2 id="the-newer-lenses">The newer lenses</h2>
+<p>The lenses added in recent builds. Each card below is the real renderer's
 output, shown through the glass — the interface is real; the world behind it is
 illustrative.</p>
 <table>
@@ -521,8 +532,8 @@ illustrative.</p>
 <td><strong>Retrace</strong> — where you last saw a thing, by place and time ("north rack, 8:12am"). Ambient-sighting recall; veil-gated.</td>
 </tr>
 <tr>
-<td><img alt="Ember" src="assets/cards/ember.webp" /></td>
-<td><strong>Ember</strong> — a memory you <em>chose to keep</em>, handed back a year later, where it happened. At most one, never an ambush, storm-suppressed.</td>
+<td><img alt="Ember" src="assets/cards/ember_flare.webp" /></td>
+<td><strong>Ember</strong> — spaced repetition for the moments you keep: an invitation to retrieve where it happened, then a flare when you reach and it's there. Detailed below.</td>
 </tr>
 <tr>
 <td><img alt="Docent" src="assets/cards/docent.webp" /></td>
@@ -530,7 +541,7 @@ illustrative.</p>
 </tr>
 <tr>
 <td><img alt="Rosetta Live" src="assets/cards/rosetta_live.webp" /></td>
-<td><strong>Rosetta Live</strong> — the ear: offline live translation, one subtitle card per utterance.</td>
+<td><strong>Rosetta Live</strong> — the ear: offline live translation, each utterance streamed into the named slots of a single on-stage figment.</td>
 </tr>
 <tr>
 <td><img alt="Candor" src="assets/cards/candor.webp" /></td>
@@ -556,8 +567,50 @@ illustrative.</p>
 <td><img alt="Kiln" src="assets/cards/kiln.webp" /></td>
 <td><strong>Kiln</strong> — an offline-total firing companion; the Brain absent by design, the log kept as a lab notebook.</td>
 </tr>
+<tr>
+<td><img alt="Stasis" src="assets/cards/stasis.webp" /></td>
+<td><strong>Stasis</strong> — save states for your mind: a double-nod holds the exact thought you were interrupted in, verbatim, and puts you back inside it later. No summary, no LLM.</td>
+</tr>
 </tbody>
 </table>
+<h3 id="ember--the-four-states-of-tending-a-memory">Ember — the four states of tending a memory</h3>
+<p>Ember is spaced repetition for the moments you <em>choose</em> to keep. The flame
+grows as the memory takes hold — an invitation, a reward, a kind answer, and
+finally consolidation:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="Ember prompt" src="assets/cards/ember_prompt.webp" /></td>
+<td><strong>Prompt</strong> — the glow at the doorway: an invitation to retrieve, right where it happened. Walk on and it costs nothing — an unanswered prompt is <em>missed</em>, never a lapse.</td>
+</tr>
+<tr>
+<td><img alt="Ember flare" src="assets/cards/ember_flare.webp" /></td>
+<td><strong>Flare</strong> — you reached and it was there. One flare, gone in a breath; the reward is the recall itself, and the curve schedules the next glimpse.</td>
+</tr>
+<tr>
+<td><img alt="Ember reveal" src="assets/cards/ember_reveal.webp" /></td>
+<td><strong>Reveal</strong> — you reached and it wasn't there. The answer, gently — no score, no streak, no shame. The curve reschedules and forgetting stays kind.</td>
+</tr>
+<tr>
+<td><img alt="Ember graduated" src="assets/cards/ember_graduated.webp" /></td>
+<td><strong>Graduated</strong> — stability crossed the threshold: the moment lives in you now. The recording can be burned, with explicit consent; the memory stays.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="stasis--save-states-for-your-mind">Stasis — save states for your mind</h3>
+<p>Interrupted mid-thought? Three things die at once — what you were doing, the
+half-formed idea, and where you stood. A <strong>double-nod</strong> (or <em>"hold that
+thought"</em>) freezes all three: the ring buffer already holds your last minute of
+thinking out loud, so the gesture costs zero words. Come back — tilt to settle
+in, or say <em>"where was I"</em> — and the ribbon re-lights and offers your own words
+back, ending on the dash your brain finishes:</p>
+<p><img alt="Stasis — the held moment, returned verbatim" src="assets/cards/stasis.webp" /></p>
     </article>
     <div class="pagenav"><a class="prev" href="world-lenses.html"><span class="dir">Previous</span><span class="ttl">Scholar and TasteLens — the World lenses</span></a><a class="next" href="progression.html"><span class="dir">Next</span><span class="ttl">Progression — the Saga</span></a></div>
     <p class="foot">DreamLayer knowledge base. Every image is rendered by the

@@ -335,7 +335,10 @@ prefers the lowest tier that can answer:</p>
 at 1.0); cloud knowledge answers carry 0.6, cloud vision 0.65, Ollama vision
 0.7 — so a caller can always prefer richer-but-lower-tier evidence.</p>
 <h2 id="the-index--your-files-on-your-machine">The index — your files, on your machine</h2>
-<p><code>server/index.py</code> walks the watched folders and splits text-like files
+<p><code>server/index.py</code> walks the watched folders — which are now
+<strong>default-deny outside your home directory and the OS temp dir</strong>: a
+watched-folder path anywhere else is refused when added, on config load,
+and again at the walk itself — and splits text-like files
 (default extensions: txt, md, markdown, rst, text, log, csv, json, py, org,
 tex; configurable) into passages of at most 600 characters, skipping files
 over the size cap and any exclude-glob match.</p>
@@ -402,9 +405,11 @@ DreamLayer Cloud preset, and Custom for any OpenAI-compatible endpoint
 (LM Studio, llama.cpp) — all hand-rolled request builders, no SDKs
 (<code>backends.py: PROVIDER_PRESETS</code>, <code>_build_cloud_request</code>). Whatever the
 provider, it is reached <strong>only</strong> when the local tiers come up empty <em>and</em>
-<code>cloud_ready()</code> holds:</p>
+<code>cloud_ready()</code> holds — and since the defaults pass, <code>cloud_enabled</code>
+starts <strong>false</strong>: the cloud tier is opt-in, off out of the box:</p>
 <pre><code>cloud_ready = network_mode != &quot;lan_only&quot;  AND  cloud_enabled
-              AND cloud_api_key set       AND  cloud_model set
+              AND cloud_model set
+              AND (cloud_api_key set  OR  provider is ollama-local)
 </code></pre>
 <p>Incognito sets <code>network_mode = "lan_only"</code>; quiet hours produce the same
 state on schedule (<code>incognito_now()</code>); and every actual cloud answer

@@ -393,6 +393,34 @@ Full visual treatment per card: <a href="../hud-cards.html">the gallery</a>.</p>
 <td>—</td>
 </tr>
 <tr>
+<td>EmberPromptCard</td>
+<td>an Ember tending moment (the cue, never the answer)</td>
+<td>device</td>
+<td>12000</td>
+<td>—</td>
+</tr>
+<tr>
+<td>EmberFlareCard</td>
+<td>you answered from memory — the warm flare</td>
+<td>device</td>
+<td>2600</td>
+<td>—</td>
+</tr>
+<tr>
+<td>EmberRevealCard</td>
+<td>the recorded answer, reached for</td>
+<td>device</td>
+<td>9000</td>
+<td>—</td>
+</tr>
+<tr>
+<td>EmberGraduatedCard</td>
+<td>graduation: burn the recording, keep the cue</td>
+<td>device</td>
+<td>9000</td>
+<td>—</td>
+</tr>
+<tr>
 <td>FactCheckCard</td>
 <td>Veritas verdict</td>
 <td>device</td>
@@ -410,14 +438,14 @@ Full visual treatment per card: <a href="../hud-cards.html">the gallery</a>.</p>
 <td>HarkCard</td>
 <td>attention policy</td>
 <td>device</td>
-<td>6500 (9000 urgent)</td>
+<td>6000 (9000 urgent)</td>
 <td><code>hark</code> / <code>hark_urgent</code>; tick / double; flash urgent</td>
 </tr>
 <tr>
 <td>TruthLensCard (testimony/gauge)</td>
 <td>delivery read</td>
 <td>device</td>
-<td>—</td>
+<td>5000</td>
 <td>—</td>
 </tr>
 <tr>
@@ -595,8 +623,12 @@ Full visual treatment per card: <a href="../hud-cards.html">the gallery</a>.</p>
 <p>Notes for implementers: cards are plain dicts — the BLE path delivers them
 straight to the device dispatch table, which is why verdict tone for the
 conversation cards is resolved in the renderer (<code>card_tone</code> / <code>FACT_COLOR</code>)
-rather than trusted from the constructor. The sample payloads used for every
-image in this book live in <code>cards.py: ALL_SAMPLES</code> (31 keys), and
+rather than trusted from the constructor. Cards can also carry a <code>spatial</code>
+payload — pan / gain / ITD / ILD / behind, computed by
+<code>hud/spatial_audio.py: spatial_payload</code> and attached by Waypath's
+<code>attach_spatial</code> — so any device renders the cue positioned at whatever
+fidelity it has. The sample payloads used for every
+image in this book live in <code>cards.py: ALL_SAMPLES</code> (35 keys), and
 <code>hud/golden_images.py</code> renders any of them with
 <code>generate_golden(card_key, golden_dir)</code>.</p>
     </article>

@@ -281,7 +281,6 @@ iridescent wings, a glowing orb ringed by memory glyphs) who appears in
 three places: floating behind the landing page's hero, greeting you on
 the phone app's first onboarding step, and resting in the corner of the
 Mac panel.</p>
-<p><img alt="Juno on the landing hero" src="assets/site/juno_hero.png" /></p>
 <p>One clip serves all three surfaces (a 10-second, 20 fps idle loop as a
 true-alpha animated WebP; the phone ships the identical bytes), and it
 degrades deliberately: reduced-motion swaps in a still, small panel
@@ -484,13 +483,23 @@ entirely from your own <strong>Waypath anchors</strong>, no Brain required:</p>
 and thing-shaped: only <em>left / put / stashed / dropped / stowed / set</em>
 (plus the parked forms) parse, and person, event, time, and idiom subjects
 are refused — so "I'm leaving at nine" and "my mom is in the hospital"
-degrade safely to a plain ask instead of becoming a bogus anchor. Both
-halves respect the Veil: incognito refuses the write ("Not while you're
-incognito.") and holds the on-glass answer too. A thing you never stashed
+degrade safely to a plain ask instead of becoming a bogus anchor. The two
+halves are gated differently on purpose: incognito refuses the write ("Not
+while you're incognito.") but a read of your own anchors still answers —
+incognito blocks keeping, not recalling. Only the full Veil (capture
+paused) holds the on-glass answer too. A thing you never stashed
 gets the honest miss: "I don't have a spot saved for your bike yet."
 More on the anchors themselves in
 <a href="perception-memory.html#stashes-and-the-waypath">Perception and memory</a>.</p>
-<h3 id="7-knowledge-intents">7. Knowledge intents</h3>
+<h3 id="7-hold-that-thought--stasis">7. Hold that thought — Stasis</h3>
+<p>Interrupted mid-task? Say <em>"hold that thought"</em> (or double-nod) and
+Stasis freezes the moment — the last thing you were saying, held
+<strong>verbatim</strong>, with where you were and what you were looking at. Coming
+back, say <em>"where was I"</em> / <em>"what was I saying"</em> (or tilt), or simply
+return to the same place or object, and it offers you back your own cues
+— never a summary, never a finished sentence, no model in the loop.
+Full detail in <a href="lenses.html">the lens set</a>.</p>
+<h3 id="8-knowledge-intents">8. Knowledge intents</h3>
 <p>Anything else runs through <code>parse_intent</code> (<code>voice.py</code>) and <code>handle_voice</code> —
 and since the wiring pass, every one of these completes end to end instead
 of returning a bare intent:</p>

@@ -275,9 +275,9 @@ remote control and the pocket brain: pairing, the three switches, every
 toggle, message approval, and a phone-sized view of everything the Brain
 knows. Seven tabs — <strong>Brain, Now, Look, Messages, People, Memories,
 Settings</strong> — plus hidden screens reached from Settings and Now (Brief,
-Plugins, Waypath, Capabilities, Device Vitals, Feel, Rewind, Saga, Profile,
-Rehearsal, Confluence, and the Cloud and Brain-tier views) and a five-step
-onboarding.</p>
+Plugins, Waypath, Capabilities, Device Vitals, Feel, Ember, Rewind, Saga,
+Profile, Rehearsal, Confluence, and the Cloud and Brain-tier views) and a
+six-step onboarding.</p>
 <p><em>Every screenshot in this chapter is the real app: the repository's code
 exported to web (<code>npx expo export --platform web</code>) and captured headlessly
 at phone size, running in </em><em>Demo Mode</em><em> — the app's own labeled sample data
@@ -327,7 +327,8 @@ incognito switch also syncs the Brain (<code>POST /dreamlayer/config</code> with
 </ul>
 <h2 id="brain--the-hub-tab">Brain — the hub tab</h2>
 <p><img alt="Brain tab" src="assets/phone/brain.png" /></p>
-<p>The default landing tab:</p>
+<p>The first tab in the bar, and the home for your setup (day to day, a cold
+launch lands on <strong>Now</strong>):</p>
 <ul>
 <li><strong>Pair a device</strong> — scan the panel's QR (expo-camera, with a paste
   fallback) or paste the <code>dreamlayer:</code> code; one code wires Mac mini and
@@ -411,15 +412,18 @@ with sources.</p>
   raise), and listening feedback (visual, audio, haptic).</li>
 <li><strong>Devices and brain:</strong> glasses status and the link to the Brain tab.</li>
 <li><strong>Labs:</strong> Saga, Profile, Rewind, Rehearsal, Confluence — joined by
-  Waypath, Capabilities, Device Vitals, and Feel (below), plus "What the
-  cloud can see" and the live Brain tier ladder.</li>
+  Waypath, Capabilities, Device Vitals, Feel, and <strong>Ember</strong> (the
+  memories-you-tend practice; see <a href="lenses.html">the lens set</a>), plus "What
+  the cloud can see" and the live Brain tier ladder.</li>
 <li><strong>Explore:</strong> the Demo Mode switch ("Explore the whole app with labeled
   sample data — no glasses or Mac needed").</li>
 <li><strong>Danger zone:</strong> Erase all memories (confirmed) — it clears the local
   memory store <em>and</em> reaches the paired Brain
   (<code>POST /dreamlayer/memories/purge</code>), which drops every saved place while
   deliberately leaving people and reminders (they are mirrors of their own
-  surfaces with their own remove controls).</li>
+  surfaces with their own remove controls). Erase now also clears the
+  on-disk cache, so a purge can no longer un-delete itself on the next
+  launch.</li>
 </ul>
 <p>The full toggle-to-effect table, with defaults and the endpoints each drives,
 is in <a href="reference/settings.html">Settings and modes</a>.</p>
@@ -537,9 +541,9 @@ is in <a href="reference/settings.html">Settings and modes</a>.</p>
 </ul>
 <h2 id="onboarding">Onboarding</h2>
 <p><img alt="Onboarding" src="assets/phone/onboarding.png" /></p>
-<p>Five steps — welcome, how it works, recall, privacy, pair — with animated
-transitions, the pairing ring, and QR scan. Finishing (or skipping) lands on
-the Brain tab.</p>
+<p>Six steps — welcome, how it works, recall, privacy, a try-the-camera look,
+pair — with animated transitions, the pairing ring, and QR scan. Finishing
+(or skipping) lands on the Now tab.</p>
 <h2 id="services-and-design-system">Services and design system</h2>
 <ul>
 <li><strong>Notifications</strong> (<code>src/services/notify.ts</code>) — permission-memoized local
@@ -548,9 +552,10 @@ the Brain tab.</p>
   permission granted.</li>
 <li><strong>Pairing codec</strong> (<code>src/services/pairing.ts</code>) — the <code>dreamlayer:</code> code,
   byte-compatible with the Python implementation.</li>
-<li><strong>Earcons</strong> (<code>src/services/sound.ts</code>) — the app ships the actual sound
-  files (<code>assets/sounds/</code>: two "hey" wakes, two listens, two watch-outs, two
-  looks, two chimes) with variant rotation that never repeats back-to-back.</li>
+<li><strong>Earcons</strong> (<code>src/services/sound.ts</code>) — the app ships the actual recorded
+  clips (<code>assets/sounds/</code>: five "hey"/"hello" greetings, four listens, four
+  watch-outs, three looks, two chimes) with variant rotation that never
+  repeats back-to-back.</li>
 <li><strong>Haptics</strong> (<code>src/services/haptics.ts</code>) — no longer four buzzes but a
   <strong>data-driven vocabulary</strong> of fourteen named signals (confirm, action,
   attention, interrupt, veil_on/veil_off ramps, commitment_crack and
@@ -602,9 +607,12 @@ the repo rather than living in someone's browser session:</p>
   <code>fastlane/metadata/</code> in <strong>nine locales</strong> — en-US, de-DE, es-ES, fr-FR,
   it, ja, ko, pt-BR, zh-Hans — plus a screenshots directory in the layout
   <code>deliver</code> expects.</li>
-<li><strong>In-app i18n</strong> (<code>src/i18n/</code>): the same nine languages for the UI
-  strings, with English as the fallback for any missing key; tab titles
-  and screens read through <code>t()</code>.</li>
+<li><strong>In-app i18n</strong> (<code>src/i18n/</code>): the same nine languages — and no longer
+  just the chrome: every tab screen's <em>body</em> is localized (placeholders,
+  section labels, day groups, empty states, interpolated counts), a
+  <strong>catalog-parity gate</strong> in the test suite fails the build if any locale
+  drifts from the English key set or ships an empty string, and icon-only
+  controls carry screen-reader labels.</li>
 <li><strong>Privacy:</strong> every locale's <code>privacy_url.txt</code> points at the real policy,
   <code>https://dreamlayer.app/privacy.html</code>, served from the landing site in
   this repository.</li>
@@ -619,7 +627,7 @@ npm test              # the phone's own test suite
 <p>The package finally has its own test suite: <strong>Jest, run as two projects</strong> —
 "logic" (ts-jest over the pure-TS stores, services, BLE framing/bridge,
 pairing) and "component" (jest-expo with React Native Testing Library over
-the screens) — 103 test cases across 19 files at time of writing,
+the screens) — 119 test cases across 21 files at time of writing,
 covering the framing parity vectors, the reconnect state machine, the
 connection store's hysteresis, the outbox, Waypath geometry and routing,
 the pack gate, and the new screens. <code>tsc --noEmit</code> remains the standing

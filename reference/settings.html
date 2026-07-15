@@ -302,7 +302,7 @@ Settings screens (placement). Persisted to AsyncStorage unless noted.</p>
 <tr>
 <td>Use cloud for hard cases</td>
 <td>Brain</td>
-<td><strong>on</strong></td>
+<td><strong>off</strong> (opt-in)</td>
 <td><code>POST /dreamlayer/config {cloud_enabled}</code>; disabled while incognito</td>
 </tr>
 <tr>
@@ -410,8 +410,9 @@ Settings screens (placement). Persisted to AsyncStorage unless noted.</p>
 </tbody>
 </table>
 <h2 id="orchestrator-setters">Orchestrator setters</h2>
-<p>The hub's programmatic surface (<code>orchestrator/orchestrator.py</code>), for
-completeness — the phone toggles above map onto these:</p>
+<p>The hub's programmatic surface (the <code>Orchestrator</code> class in
+<code>orchestrator/orchestrator.py</code>, assembled from the <code>orchestrator/ops_*.py</code>
+mixins), for completeness — the phone toggles above map onto these:</p>
 <table>
 <thead>
 <tr>
@@ -533,7 +534,7 @@ persisted as <code>brain_config.json</code>, secrets masked on read:</p>
 <tr>
 <td><code>model</code></td>
 <td><code>"keyword"</code></td>
-<td><code>keyword</code> or <code>ollama</code></td>
+<td><code>keyword</code>, <code>ollama</code>, or <code>mlx</code> (Apple-Silicon-native, falls back to Ollama)</td>
 </tr>
 <tr>
 <td><code>ollama_url</code></td>
@@ -572,8 +573,13 @@ persisted as <code>brain_config.json</code>, secrets masked on read:</p>
 </tr>
 <tr>
 <td><code>cloud_enabled</code></td>
-<td><strong>true</strong></td>
-<td>the cloud switch</td>
+<td><strong>false</strong></td>
+<td>the cloud switch — opt-in</td>
+</tr>
+<tr>
+<td><code>cloud_provider</code></td>
+<td><code>openai</code></td>
+<td><code>openai</code> / <code>anthropic</code> / <code>gemini</code> / <code>openrouter</code> / <code>ollama</code> / <code>dreamlayer</code> / <code>custom</code> preset</td>
 </tr>
 <tr>
 <td><code>cloud_base_url</code></td>
@@ -649,6 +655,16 @@ persisted as <code>brain_config.json</code>, secrets masked on read:</p>
 <td><code>reminders_sync</code> / <code>reminder_lists</code></td>
 <td>off / all</td>
 <td>macOS Reminders seam</td>
+</tr>
+<tr>
+<td><code>plan</code></td>
+<td><code>"free"</code></td>
+<td>billing-tier seam (no paywall today; see <code>server.PLAN_CAPS</code>)</td>
+</tr>
+<tr>
+<td><code>disabled_caps</code></td>
+<td><code>[]</code></td>
+<td>capabilities the panel switched off (persisted twin of <code>DL_DISABLE_&lt;KEY&gt;</code>)</td>
 </tr>
 </tbody>
 </table>

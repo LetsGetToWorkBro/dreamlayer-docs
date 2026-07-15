@@ -410,7 +410,9 @@ validation gate, now <strong>five defences</strong>:</p>
 <li>A static AST scan — <code>subprocess</code>, sockets, <code>ctypes</code>, file deletion,
    <code>eval</code>/<code>exec</code>/<code>pickle</code> are flagged; each allowed only if the matching
    capability was declared, some forbidden outright.</li>
-<li>A smoke load against a mock context granting only declared capabilities.</li>
+<li>A smoke load against a mock context granting only declared
+   capabilities — <strong>opt-in author tooling only</strong> since the secure-defaults
+   pass: validating a package on the install path never executes its code.</li>
 </ol>
 <p>The honest limit, stated in <code>docs/MARKETPLACE.md</code>: in-process Python cannot
 be perfectly sandboxed — the gate is defense-in-depth for a curated,
@@ -421,7 +423,11 @@ path.</p>
 <li><strong>The website — <a href="https://dreamlayer.app/plugins.html">dreamlayer.app/plugins</a>:</strong>
   browse, search, Featured / Top rated / Most downloaded tabs, per-plugin
   detail with the author's screenshot, plain-English permissions, star
-  rating, and a copy-install action.</li>
+  rating, and a copy-install action.
+  Search is one ranked, typo-tolerant scorer (fielded weights, a curated
+  concept map, one-edit tolerance) shared verbatim by the store page, the
+  phone, and the Worker's search route — the same query ranks the same
+  everywhere.</li>
 <li><strong>The phone</strong> — the Plugins screen (Settings, "Build on the layer"):
   same catalog, install/remove, one-tap rating, and a permissions alert
   before any install ("This plugin will be able to use: ..."). Installs

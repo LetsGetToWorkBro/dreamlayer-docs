@@ -275,11 +275,13 @@ pairing token header <strong><code>X-DreamLayer-Token</code></strong> (the panel
 automatically when opened on the machine itself). Endpoints marked
 <strong>local</strong> additionally refuse any off-box client (403) because they expose
 secrets, the filesystem, or outbound action. Any token-bearing off-box
-request also stamps the "phone last seen" heartbeat.</p>
+request also stamps the "phone last seen" heartbeat. Since the audit
+waves the server <strong>binds loopback-only by default</strong> — an empty token is
+trusted only from 127.0.0.1, and a LAN bind (<code>--host 0.0.0.0</code>) mints a
+pairing token if none exists, with off-box token guesses rate-limited.</p>
 <p>Source: <code>host-python/src/dreamlayer/ai_brain/server/server.py</code>. This table
-is the complete surface — including three endpoints
-(<code>/dreamlayer/voice</code>, the profile pair, <code>/dreamlayer/brief/latest</code>) that
-exist in code beyond the summary tables in <code>docs/INTEGRATION.md</code>.</p>
+is the complete surface; <code>docs/INTEGRATION.md</code> carries the same tables with
+the seams marked.</p>
 <h2 id="read-get">Read (GET)</h2>
 <table>
 <thead>
@@ -389,6 +391,11 @@ exist in code beyond the summary tables in <code>docs/INTEGRATION.md</code>.</p>
 <td><code>/dreamlayer/memories</code></td>
 <td>token</td>
 <td>assembled kept memory: saved places, people met, owed favors, dated reminders</td>
+</tr>
+<tr>
+<td><code>/dreamlayer/ember</code></td>
+<td>token</td>
+<td>the Ember practice state: engrams, due tendings, graduation status</td>
 </tr>
 <tr>
 <td><code>/panel-assets/&lt;name&gt;</code></td>
@@ -593,6 +600,16 @@ exist in code beyond the summary tables in <code>docs/INTEGRATION.md</code>.</p>
 <td><code>{}</code> → drop every saved place (people and reminders deliberately survive)</td>
 </tr>
 <tr>
+<td><code>/dreamlayer/ember/tend</code></td>
+<td>token</td>
+<td>a tending answer → grade + reschedule (FSRS-shaped)</td>
+</tr>
+<tr>
+<td><code>/dreamlayer/ember/burn</code></td>
+<td>token</td>
+<td>explicit consent → burn the recording, keep the cue-only tombstone</td>
+</tr>
+<tr>
 <td><code>/dreamlayer/memory/browse</code></td>
 <td><strong>local</strong></td>
 <td><code>{}</code> → launch a read-only Datasette over the memory file <code>{available, url}</code></td>
@@ -679,8 +696,9 @@ exist in code beyond the summary tables in <code>docs/INTEGRATION.md</code>.</p>
 <li>The <strong>plugin social API</strong> is a separate public service at
   <code>https://api.dreamlayer.app</code> (Cloudflare Worker, <code>registry-api/</code>):
   <code>GET /api/plugins</code>, <code>GET /api/plugins/&lt;name&gt;</code>, and
-  <code>POST /api/plugins/&lt;name&gt;/{rate|comment|download}</code>. It serves only
-  ratings/downloads/comments — never plugin code — and clients fall back to
+  <code>POST /api/plugins/&lt;name&gt;/{rate|comment|download}</code>, plus the community
+  routes (<code>/api/waitlist</code>, <code>/api/figments</code>, <code>/api/golf</code>, <code>/api/jams</code>). It
+  serves only social data — never plugin code — and clients fall back to
   their bundled catalog when it is unreachable.</li>
 </ul>
     </article>
