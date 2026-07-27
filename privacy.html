@@ -436,9 +436,22 @@ connection tests, model pulls, and message sends.</p>
 one Settings group:</p>
 <p><img alt="Phone privacy settings" src="assets/phone/settings.png" /></p>
 <h2 id="deliberately-not-built">Deliberately not built</h2>
-<p>No stranger face lookup, no public face database, no voice cloning, no covert
-recording. These are absent from the codebase by design, not disabled by
-configuration — see <code>docs/PRIVACY_MODEL.md</code> for the standing threat model.</p>
+<p>No stranger face lookup, no public face database, <strong>no cloning of anyone's
+voice but Juno's</strong>, no covert recording. See <code>docs/PRIVACY_MODEL.md</code> for the
+standing threat model.</p>
+<p>The first, second and fourth are absent from the codebase, not switched off. The
+shipped face embedder cannot return an identity at all — with no face model
+present it declines every frame rather than guessing, so there is no setting that
+turns stranger recognition on.</p>
+<p>The voice line needs one sentence more, because a blanket "no voice cloning"
+would be false and we would rather be precise than absolute. A voice-cloning
+engine (XTTS) <em>is</em> in the tree, behind an opt-in extra, and it exists for
+exactly one purpose: so Juno can speak in <em>her own</em> voice offline instead of
+a stock robot one. The only place the product builds it points the reference
+clips at her baked <code>juno_*.mp3</code> takes, hard-coded. <strong>No microphone
+audio, no recording of you, and no recording of anyone near you is ever used as a
+voice reference</strong> — there is no code path that would accept one. That is the
+promise worth making, and it is the one the code keeps.</p>
     </article>
     <div class="pagenav"><a class="prev" href="progression.html"><span class="dir">Previous</span><span class="ttl">Progression — the Saga</span></a><a class="next" href="phone-app.html"><span class="dir">Next</span><span class="ttl">The phone app</span></a></div>
     <p class="foot">DreamLayer knowledge base. Every image is rendered by the
